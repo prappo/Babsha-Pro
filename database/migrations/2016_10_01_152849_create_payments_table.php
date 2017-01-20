@@ -20,6 +20,7 @@ class CreatePaymentsTable extends Migration
             $table->string("token");
             $table->string("payerId");
             $table->integer("amount");
+            $table->string('userId');
             $table->timestamps();
         });
     }

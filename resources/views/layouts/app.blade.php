@@ -89,94 +89,22 @@
                     <li><a href="{{ url('/login') }}">Login</a></li>
 
                 @else
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-             <span
-                     class="badge">{{\App\Http\Controllers\Data::getUnit()}} {{\App\Income::sum('money')}}</span>
-                            <span class="caret"></span>
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{url('/earning/history') }}"><i class="fa fa-money"></i> Earning History</a>
-                            </li>
-                            <li><a href="{{url('/earning/history/paypal') }}"><i class="fa fa-paypal"></i> Paypal History</a>
-                            </li>
-
-
-                        </ul>
-
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="#" id="massMsg" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                           aria-expanded="false">
-                            <i class="fa fa-envelope"></i> Mass Message </span>
-                        </a>
-
-
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Orders <span class="badge">{{\App\Orders::where('status','pending')->count()}}</span> <span
-                                    class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{url('/orders') }}"><i class="fa fa-tag"></i> View Orders</a></li>
-                            <li><a href="{{url('/orders/history') }}"><i class="fa fa-shopping-cart"></i> Orders
-                                    History</a></li>
-
-                        </ul>
-                    </li>
-
-
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Products <span class="badge">{{\App\Products::all()->count()}}</span> <span
-                                    class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{url('/showproducts') }}"><i class="fa fa-list"></i> View Products</a></li>
-
-                            <li><a href="{{ url('/addproduct') }}"><i class="fa fa-btn fa-plus"></i> Add new Product</a>
-                            <li><a href="{{url('/showcategory') }}"><i class="fa fa-th"></i> View Categories</a></li>
-                            <li><a href="{{ url('/addcategory') }}"><i class="fa fa-btn fa-plus"></i> Add new
-                                    category</a></li>
-                            </li>
-                            <li><a href="{{url('/showproducts/woo') }}"><i class="fa fa-wordpress"></i> View WooCommerce Products</a></li>
-                            <li><a href="{{ url('/woo/addcategory') }}"><i class="fa fa-btn fa-wordpress"></i> Add WooCommerce
-                                    category</a></li>
-                            </li>
-                            <li><a href="{{ url('/woo/showcategory') }}"><i class="fa fa-btn fa-wordpress"></i> View WooCommerce categories</a></li>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Customers <span class="badge">{{\App\Customers::all()->count()}}</span><span
-                                    class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{url('/customers')}}"><i class="fa fa-users"></i> Customers</a></li>
-
-                        </ul>
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Bot <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="{{url('/bot')}}"><i class="fa fa-rocket"></i> Bot replies</a></li>
-
-
-                        </ul>
-                    </li>
 
                     @if(Auth::user()->type == 'admin')
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Site Settings <span
+                                        class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{url('/settings/site') }}"><i class="fa fa-th"></i> Site Settings</a></li>
+                                {{--                                <li><a href="{{url('/bot/settings') }}"><i class="fa fa-rocket"></i> Bot Settings</a>--}}
+                                </li>
+                            </ul>
+                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
@@ -190,30 +118,145 @@
 
                             </ul>
                         </li>
-                    @endif
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            {{ Auth::user()->name }} <span class="caret"></span>
-                        </a>
 
-                        <ul class="dropdown-menu" role="menu">
-                            @if(Auth::user()->type == 'admin')
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                {{ Auth::user()->name }} <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+
+
+                                <li><a href="{{url('/profile') }}"><i class="fa fa-user"></i> Profile</a></li>
+                                <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+             <span
+                     class="badge">{{\App\Http\Controllers\Data::getUnit()}} {{\App\Income::where('userId',Auth::user()->id)->sum('money')}}</span>
+                                <span class="caret"></span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{url('/earning/history') }}"><i class="fa fa-money"></i> Earning
+                                        History</a>
+                                </li>
+                                <li><a href="{{url('/earning/history/paypal') }}"><i class="fa fa-paypal"></i> Paypal
+                                        History</a>
+                                </li>
+
+
+                            </ul>
+
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" id="massMsg" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <i class="fa fa-envelope"></i> Mass Message </span>
+                            </a>
+
+
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Orders <span class="badge">{{\App\Orders::where('userId',Auth::user()->id)->where('status','pending')->count()}}</span>
+                                <span
+                                        class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{url('/orders') }}"><i class="fa fa-tag"></i> View Orders</a></li>
+                                <li><a href="{{url('/orders/history') }}"><i class="fa fa-shopping-cart"></i> Orders
+                                        History</a></li>
+
+                            </ul>
+                        </li>
+
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Products <span class="badge">{{\App\Products::where('userId',Auth::user()->id)->count()}}</span> <span
+                                        class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{url('/showproducts') }}"><i class="fa fa-list"></i> View Products</a>
+                                </li>
+
+                                <li><a href="{{ url('/addproduct') }}"><i class="fa fa-btn fa-plus"></i> Add new Product</a>
+                                <li><a href="{{url('/showcategory') }}"><i class="fa fa-th"></i> View Categories</a>
+                                </li>
+                                <li><a href="{{ url('/addcategory') }}"><i class="fa fa-btn fa-plus"></i> Add new
+                                        category</a></li>
+                                </li>
+                                <li><a href="{{url('/showproducts/woo') }}"><i class="fa fa-wordpress"></i> View
+                                        WooCommerce Products</a></li>
+                                <li><a href="{{ url('/woo/addcategory') }}"><i class="fa fa-btn fa-wordpress"></i> Add
+                                        WooCommerce
+                                        category</a></li>
+                                </li>
+                                <li><a href="{{ url('/woo/showcategory') }}"><i class="fa fa-btn fa-wordpress"></i> View
+                                        WooCommerce categories</a></li>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Customers <span class="badge">{{\App\Customers::awhere('userId',Auth::user()->id)->count()}}</span><span
+                                        class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{url('/customers')}}"><i class="fa fa-users"></i> Customers</a></li>
+
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Bot <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{url('/bot')}}"><i class="fa fa-rocket"></i> Bot replies</a></li>
+
+
+                            </ul>
+                        </li>
+
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                {{ Auth::user()->name }} <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+
                                 <li><a href="{{url('/settings') }}"><i class="fa fa-gear"></i> Settings</a></li>
-                                <li><a href="{{url('/bot/settings') }}"><i class="fa fa-rocket"></i> Bot Settings</a></li>
-                            @endif
-                            <li><a href="{{url('/profile') }}"><i class="fa fa-user"></i> Profile</a></li>
-                            <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
-                        </ul>
-                    </li>
+                                <li><a href="{{url('/profile') }}"><i class="fa fa-user"></i> Profile</a></li>
+                                <li><a href="{{ url('/logout') }}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                            </ul>
+                        </li>
 
-                    <li class="dropdown">
-                        <a href="{{url('/notifications')}}" id="massMsg" class="dropdown-toggle" role="button"
-                          >
-                            <i class="fa fa-bell"><sup><b>{{\App\Notifications::count()}}</b></sup></i>
-                        </a>
+                        <li class="dropdown">
+                            <a href="{{url('/notifications')}}" id="massMsg" class="dropdown-toggle" role="button"
+                            >
+                                <i class="fa fa-bell"><sup><b>{{\App\Notifications::where('userId',Auth::user()->id)->count()}}</b></sup></i>
+                            </a>
 
 
-                    </li>
+                        </li>
+                    @endif
                 @endif
             </ul>
         </div>

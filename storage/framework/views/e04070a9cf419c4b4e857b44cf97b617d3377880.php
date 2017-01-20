@@ -1,6 +1,5 @@
-@extends('layouts.app')
-@section('title','Settings')
-@section('content')
+<?php $__env->startSection('title','Settings'); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
@@ -12,7 +11,7 @@
                             <div class="row">
                                 <div class="col-md-4"></div>
                                 <div class="col-md-6">
-                                    <a class="btn btn-primary" href="{{$loginUrl}}">Connect with facebook</a>
+                                    <a class="btn btn-primary" href="<?php echo e($loginUrl); ?>">Connect with facebook</a>
                                 </div>
                             </div>
                             <br>
@@ -21,9 +20,9 @@
 
                                 <div class="col-md-6">
                                     <select class="form-control">
-                                        @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fbPage)
-                                            <option>{{$fbPage->pageName}}</option>
-                                        @endforeach
+                                        <?php foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fbPage): ?>
+                                            <option><?php echo e($fbPage->pageName); ?></option>
+                                        <?php endforeach; ?>
                                     </select>
 
                                 </div>
@@ -34,7 +33,7 @@
 
                                 <div class="col-md-6">
                                     <input type="text"
-                                           value="{{\App\Settings::where('userId',Auth::user()->id)->value('title')}}"
+                                           value="<?php echo e(\App\Settings::where('userId',Auth::user()->id)->value('title')); ?>"
                                            class="form-control" id="title">
 
                                 </div>
@@ -44,7 +43,7 @@
                                 <label for="subTitle" class="col-md-4 control-label">Shop Sub Title</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getShopSubTitle()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getShopSubTitle()); ?>"
                                            class="form-control" id="subTitle">
 
                                 </div>
@@ -54,7 +53,7 @@
                                 <label for="phone" class="col-md-4 control-label">Phone</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getPhone()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getPhone()); ?>"
                                            class="form-control" id="phone">
 
                                 </div>
@@ -64,7 +63,7 @@
                                 <label for="email" class="col-md-4 control-label">Email</label>
 
                                 <div class="col-md-6">
-                                    <input type="email" value="{{\App\Http\Controllers\Data::getEmail()}}"
+                                    <input type="email" value="<?php echo e(\App\Http\Controllers\Data::getEmail()); ?>"
                                            class="form-control" id="email">
 
                                 </div>
@@ -74,7 +73,7 @@
                                 <label for="address" class="col-md-4 control-label">Address</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getShopAddress()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getShopAddress()); ?>"
                                            class="form-control" id="address">
 
                                 </div>
@@ -84,7 +83,7 @@
                                 <label for="afterOrderMsg" class="col-md-4 control-label">After order Message</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getAfterOrderMsg()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getAfterOrderMsg()); ?>"
                                            class="form-control" id="afterOrderMsg">
 
                                 </div>
@@ -94,7 +93,7 @@
                                 <label for="map" class="col-md-4 control-label">Map Data</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getMapData()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getMapData()); ?>"
                                            class="form-control" id="map">
 
                                 </div>
@@ -111,7 +110,7 @@
                                                id="file"/><br>
                                         <input class="btn btn-xs btn-success" type="submit" value="Upload"
                                                id="imgUploadBtn"/>
-                                        <input type="hidden" value="{{\App\Http\Controllers\Data::getLogoData()}}"
+                                        <input type="hidden" value="<?php echo e(\App\Http\Controllers\Data::getLogoData()); ?>"
                                                id="image">
                                         <div id="imgMsg"></div>
                                     </form>
@@ -150,7 +149,7 @@
                                 <label for="tax" class="col-md-4 control-label">Tax</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getTax()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getTax()); ?>"
                                            class="form-control" id="tax">
 
                                 </div>
@@ -161,7 +160,7 @@
                                 <label for="shipping" class="col-md-4 control-label">Shipping Cost</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getShippingCost()}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Data::getShippingCost()); ?>"
                                            class="form-control" id="shipping">
 
                                 </div>
@@ -181,7 +180,7 @@
                                 <label for="paypalClientId" class="col-md-4 control-label">PayPal Client ID</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Settings::get('paypalClientId')}}"
+                                    <input type="text" value="<?php echo e(\App\Http\Controllers\Settings::get('paypalClientId')); ?>"
                                            class="form-control" id="paypalClientId">
 
                                 </div>
@@ -193,18 +192,18 @@
 
                                 <div class="col-md-6">
                                     <input type="text"
-                                           value="{{\App\Http\Controllers\Settings::get('paypalClientSecret')}}"
+                                           value="<?php echo e(\App\Http\Controllers\Settings::get('paypalClientSecret')); ?>"
                                            class="form-control" id="paypalClientSecret">
 
                                 </div>
                             </div>
-                            @if(\App\Http\Controllers\PackagesController::isMyPackage('woo'))
-                                {{-- woo commerce settings start--}}
+                            <?php if(\App\Http\Controllers\PackagesController::isMyPackage('woo')): ?>
+                                <?php /* woo commerce settings start*/ ?>
                                 <div class="form-group">
                                     <label for="wpUrl" class="col-md-4 control-label">WordPress URL</label>
 
                                     <div class="col-md-6">
-                                        <input type="text" value="{{\App\Http\Controllers\Settings::get('wpUrl')}}"
+                                        <input type="text" value="<?php echo e(\App\Http\Controllers\Settings::get('wpUrl')); ?>"
                                                class="form-control" id="wpUrl">
 
                                     </div>
@@ -215,7 +214,7 @@
 
                                     <div class="col-md-6">
                                         <input type="text"
-                                               value="{{\App\Http\Controllers\Settings::get('wooConsumerKey')}}"
+                                               value="<?php echo e(\App\Http\Controllers\Settings::get('wooConsumerKey')); ?>"
                                                class="form-control" id="wooConsumerKey">
 
                                     </div>
@@ -226,14 +225,14 @@
 
                                     <div class="col-md-6">
                                         <input type="text"
-                                               value="{{\App\Http\Controllers\Settings::get('wooConsumerSecret')}}"
+                                               value="<?php echo e(\App\Http\Controllers\Settings::get('wooConsumerSecret')); ?>"
                                                class="form-control" id="wooConsumerSecret">
 
                                     </div>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
-                            {{-- woo commerce settings end--}}
+                            <?php /* woo commerce settings end*/ ?>
 
 
                             <div class="form-group">
@@ -250,9 +249,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('js')
+<?php $__env->startSection('js'); ?>
     <script>
         if ($('#lang').val() == 'no') {
             $('#gt').hide();
@@ -261,7 +260,7 @@
             e.preventDefault();
             $('#imgMsg').html("Please wait ...");
             $.ajax({
-                url: "{{url('/iup')}}",
+                url: "<?php echo e(url('/iup')); ?>",
                 type: "POST",
                 data: new FormData(this),
                 contentType: false,
@@ -288,7 +287,7 @@
         $('#update').click(function () {
             $.ajax({
                 type: 'POST',
-                url: "{{url('/settings')}}",
+                url: "<?php echo e(url('/settings')); ?>",
                 data: {
                     'title': $('#title').val(),
                     'subTitle': $('#subTitle').val(),
@@ -309,11 +308,11 @@
                     'appSec': $('#appSec').val(),
                     'reg': 'off',
                     'lang': $('#lang').val(),
-                    @if(\App\Http\Controllers\PackagesController::isMyPackage('woo'))
+                    <?php if(\App\Http\Controllers\PackagesController::isMyPackage('woo')): ?>
                     'wpUrl': $('#wpUrl').val(),
                     'wooConsumerKey': $('#wooConsumerKey').val(),
                     'wooConsumerSecret': $('#wooConsumerSecret').val(),
-                    @endif
+                    <?php endif; ?>
                     'fixedLang': $('#fixedLang').val(),
                     'fixedLangOp': $('#fixedLangOp').val()
 
@@ -333,4 +332,6 @@
 
 
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

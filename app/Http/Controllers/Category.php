@@ -6,6 +6,7 @@ use App\Catagories;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\Auth;
 
 class Category extends Controller
 {
@@ -42,7 +43,7 @@ class Category extends Controller
 
         ];
         try{
-            if(Catagories::count() >= 10){
+            if(Catagories::where('userId',Auth::user()->id)->count() >= 10){
                 return "Sorry sir , you can't add more than 10 categories. All because facebook gui button don't allow more than 10 buttons . But in the next version we will make subcategory system fore more options . thanks for your patience";
             }
             try{
@@ -52,6 +53,7 @@ class Category extends Controller
 
             $cat = new Catagories();
             $cat->name = $name;
+            $cat->userId = Auth::user()->id;
             $cat->save();
             return "success";
         }

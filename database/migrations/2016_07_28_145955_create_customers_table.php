@@ -27,6 +27,7 @@ class CreateCustomersTable extends Migration
             $table->string('bot')->nullable();
             $table->string('coordinates')->nullable();
             $table->string('address')->nullable();
+            $table->string('userId');
             $table->timestamps();
         });
     }

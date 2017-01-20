@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\FacebookPages;
+use App\SiteSettings;
 use App\Translate;
 use Facebook\Exceptions\FacebookResponseException;
 use Facebook\Exceptions\FacebookSDKException;
@@ -25,51 +27,50 @@ class Settings extends Controller
     public function index()
     {
 
-        if (Settings::get('appId') == "" && Settings::get('appSec') == "") {
-            $loginUrl = "";
-        } else {
-            $fb = new Facebook([
-                'app_id' => Settings::get('appId'),
-                'app_secret' => Settings::get('appSec'),
-                'default_graph_version' => 'v2.6',
-            ]);
 
-            try {
-                $permissions = ['pages_messaging', 'publish_actions', 'manage_pages', 'publish_pages'];
-                $helper = $fb->getRedirectLoginHelper();
-                $loginUrl = $helper->getLoginUrl(url('') . '/fbconnect', $permissions);
-            } catch (\Exception $e) {
-                $loginUrl = url('/');
-            }
+        $fb = new Facebook([
+            'app_id' => SiteSettings::where('key', 'appId')->value('value'),
+            'app_secret' => SiteSettings::where('key', 'appSec')->value('value'),
+            'default_graph_version' => 'v2.6',
+        ]);
+
+        try {
+            $permissions = ['pages_messaging', 'publish_actions', 'manage_pages', 'publish_pages'];
+            $helper = $fb->getRedirectLoginHelper();
+            $loginUrl = $helper->getLoginUrl(url('') . '/fbconnect', $permissions);
+        } catch (\Exception $e) {
+            $loginUrl = url('/');
         }
+
 
         return view('settings', compact('loginUrl'));
     }
 
-    public function translation(){
-        if(Auth::user()->type != 'admin'){
+    public function translation()
+    {
+        if (Auth::user()->type != 'admin') {
             return view('home');
         }
         return view('translation');
     }
 
-    public function updateTranslation(Request $request){
+    public function updateTranslation(Request $request)
+    {
         $inputs = $request->input();
-        $count =1;
+        $count = 1;
         $result = "";
-       try{
-           foreach ($inputs as $input){
-               Translate::where('langId',$count)->update(['lang'=>$inputs[$count]]);
-               $count++;
-           }
-           $result = "<div class=\"alert alert-success\" role=\"alert\">Updated successfully</div>";
+        try {
+            foreach ($inputs as $input) {
+                Translate::where('langId', $count)->update(['lang' => $inputs[$count]]);
+                $count++;
+            }
+            $result = "<div class=\"alert alert-success\" role=\"alert\">Updated successfully</div>";
 
-           return view('result',compact('result'));
-       }
-       catch (\Exception $e){
-           $result ="<div class=\"alert alert-danger\" role=\"alert\">". $e->getMessage()."</div>";
-           return view('result',compact($result));
-       }
+            return view('result', compact('result'));
+        } catch (\Exception $e) {
+            $result = "<div class=\"alert alert-danger\" role=\"alert\">" . $e->getMessage() . "</div>";
+            return view('result', compact($result));
+        }
 
 
     }
@@ -79,8 +80,8 @@ class Settings extends Controller
         session_start();
 
         $fb = new Facebook([
-            'app_id' => Settings::get('appId'),
-            'app_secret' => Settings::get('appSec'),
+            'app_id' => SiteSettings::where('key', 'appId')->value('value'),
+            'app_secret' => SiteSettings::where('key', 'appSec')->value('value'),
             'default_graph_version' => 'v2.6',
         ]);
 
@@ -90,6 +91,22 @@ class Settings extends Controller
         try {
             $accessToken = $helper->getAccessToken();
             $_SESSION['token'] = $accessToken;
+
+
+            $response = $fb->get('me/accounts', $accessToken);
+            $body = $response->getBody();
+            $data = json_decode($body, true);
+            FacebookPages::truncate();
+            foreach ($data['data'] as $no => $filed) {
+
+                $facebookPages = new FacebookPages();
+                $facebookPages->pageId = $filed['id'];
+                $facebookPages->pageName = $filed['name'];
+                $facebookPages->pageToken = $filed['access_token'];
+                $facebookPages->userId = Auth::user()->id;
+                $facebookPages->save();
+
+            }
 
         } catch (FacebookResponseException $e) {
             // When Graph returns an error
@@ -121,9 +138,14 @@ class Settings extends Controller
      * @param $key
      * @return mixed
      */
-    public static function get($key)
+    public static function get($value, $userId = "")
     {
-        return \App\Settings::where('key', $key)->value('value');
+        if ($userId == "") {
+            return \App\Settings::where('userId', Auth::user())->value($value);
+        } else {
+            return SiteSettings::where('key', $value)->value('value');
+        }
+
     }
 
     public static function getLang($key)
@@ -138,28 +160,28 @@ class Settings extends Controller
     public function update(Request $re)
     {
         try {
-            DB::table('settings')->where('key', 'token')->update(['value' => $re->token]);
-            DB::table('settings')->where('key', 'email')->update(['value' => $re->email]);
-            DB::table('settings')->where('key', 'currency')->update(['value' => $re->currency]);
-            DB::table('settings')->where('key', 'paymentMethod')->update(['value' => $re->paymentMethod]);
-            DB::table('settings')->where('key', 'shipping')->update(['value' => $re->shipping]);
-            DB::table('settings')->where('key', 'afterOrderMsg')->update(['value' => $re->afterOrderMsg]);
-            DB::table('settings')->where('key', 'tax')->update(['value' => $re->tax]);
-            DB::table('settings')->where('key', 'logo')->update(['value' => $re->logo]);
-            DB::table('settings')->where('key', 'title')->update(['value' => $re->title]);
-            DB::table('settings')->where('key', 'subTitle')->update(['value' => $re->subTitle]);
-            DB::table('settings')->where('key', 'phone')->update(['value' => $re->phone]);
-            DB::table('settings')->where('key', 'address')->update(['value' => $re->address]);
-            DB::table('settings')->where('key', 'map')->update(['value' => $re->map]);
-            DB::table('settings')->where('key', 'appId')->update(['value' => $re->appId]);
-            DB::table('settings')->where('key', 'appSec')->update(['value' => $re->appSec]);
-            DB::table('settings')->where('key', 'reg')->update(['value' => $re->reg]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['token' => $re->token]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['email' => $re->email]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['currency' => $re->currency]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['paymentMethod' => $re->paymentMethod]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['shipping' => $re->shipping]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['afterOrderMsg' => $re->afterOrderMsg]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['tax' => $re->tax]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['logo' => $re->logo]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['title' => $re->title]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['subTitle' => $re->subTitle]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['phone' => $re->phone]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['address' => $re->address]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['map' => $re->map]);
+
 //            DB::table('settings')->where('key', 'lang')->update(['value' => $re->lang]);
-            DB::table('settings')->where('key', 'paypalClientId')->update(['value' => $re->paypalClientId]);
-            DB::table('settings')->where('key', 'paypalClientSecret')->update(['value' => $re->paypalClientSecret]);
-            DB::table('settings')->where('key', 'wpUrl')->update(['value' => $re->wpUrl]);
-            DB::table('settings')->where('key', 'wooConsumerKey')->update(['value' => $re->wooConsumerKey]);
-            DB::table('settings')->where('key', 'wooConsumerSecret')->update(['value' => $re->wooConsumerSecret]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['paypalClientId' => $re->paypalClientId]);
+            DB::table('settings')->where('userId', Auth::user()->id)->update(['paypalClientSecret' => $re->paypalClientSecret]);
+            if (PackagesController::isMyPackage('woo')) {
+                DB::table('settings')->where('userId', Auth::user()->id)->update(['wpUrl' => $re->wpUrl]);
+                DB::table('settings')->where('userId', Auth::user()->id)->update(['wooConsumerKey' => $re->wooConsumerKey]);
+                DB::table('settings')->where('userId', Auth::user()->id)->update(['wooConsumerSecret' => $re->wooConsumerSecret]);
+            }
 
 
             return "success";
@@ -169,22 +191,32 @@ class Settings extends Controller
         }
     }
 
-    public function bot(){
+    public function updateFacebook(Request $request)
+    {
+        try {
+
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
+    }
+
+    public function bot()
+    {
         return view('botsettings');
     }
 
-    public function botUpdate(Request $request){
+    public function botUpdate(Request $request)
+    {
 
-        if($request->message == ""){
+        if ($request->message == "") {
             $message = "Welcome to my Shop";
-        }
-        else{
+        } else {
             $message = $request->message;
         }
         $jsonGreeting = '{
   "setting_type":"greeting",
   "greeting":{
-    "text":"'.$message.'"
+    "text":"' . $message . '"
   }
 }';
         $jsonMenu = '{
@@ -231,7 +263,7 @@ class Settings extends Controller
 
         $jsonWhitelist = '{
   "setting_type" : "domain_whitelisting",
-  "whitelisted_domains" : ["'.secure_url('/').'"],
+  "whitelisted_domains" : ["' . secure_url('/') . '"],
   "domain_action_type": "add"
 }';
 
@@ -240,6 +272,28 @@ class Settings extends Controller
         Boot::thread($jsonMenu);
         Boot::thread($jsonWhitelist);
 
+
+    }
+
+    public function siteSettings()
+    {
+        return view('siteSettings');
+    }
+
+    public function updateSiteSettings(Request $request)
+    {
+        try {
+            SiteSettings::where('key', 'appId')->update([
+                'value' => $request->appId
+            ]);
+
+            SiteSettings::where('key', 'appSec')->update([
+                'value' => $request->appSec
+            ]);
+            return "success";
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
 
     }
 

@@ -16,6 +16,7 @@ class CreateSubscribesTable extends Migration
             $table->increments('id');
             $table->string('fbId');
             $table->string('status');
+            $table->string('userId');
             $table->timestamps();
         });
     }

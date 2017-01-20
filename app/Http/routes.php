@@ -59,6 +59,8 @@ Route::get('/orders/history', 'Orders@orderHistory');
 Route::get('/earning/history', 'Orders@earningHistory');
 Route::get('/earning/history/paypal', 'PayPalController@paypalHistory');
 Route::get('/settings', 'Settings@index');
+Route::get('/settings/site', 'Settings@siteSettings');
+Route::post('/settings/site', 'Settings@updateSiteSettings');
 Route::post('/settings', 'Settings@update');
 Route::post('/update/translate', 'Settings@updateTranslation');
 Route::get('/translate/settings', 'Settings@translation');

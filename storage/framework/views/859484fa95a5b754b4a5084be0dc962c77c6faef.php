@@ -90,94 +90,22 @@
                     <li><a href="<?php echo e(url('/login')); ?>">Login</a></li>
 
                 <?php else: ?>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-             <span
-                     class="badge"><?php echo e(\App\Http\Controllers\Data::getUnit()); ?> <?php echo e(\App\Income::sum('money')); ?></span>
-                            <span class="caret"></span>
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="<?php echo e(url('/earning/history')); ?>"><i class="fa fa-money"></i> Earning History</a>
-                            </li>
-                            <li><a href="<?php echo e(url('/earning/history/paypal')); ?>"><i class="fa fa-paypal"></i> Paypal History</a>
-                            </li>
-
-
-                        </ul>
-
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="#" id="massMsg" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                           aria-expanded="false">
-                            <i class="fa fa-envelope"></i> Mass Message </span>
-                        </a>
-
-
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Orders <span class="badge"><?php echo e(\App\Orders::where('status','pending')->count()); ?></span> <span
-                                    class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="<?php echo e(url('/orders')); ?>"><i class="fa fa-tag"></i> View Orders</a></li>
-                            <li><a href="<?php echo e(url('/orders/history')); ?>"><i class="fa fa-shopping-cart"></i> Orders
-                                    History</a></li>
-
-                        </ul>
-                    </li>
-
-
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Products <span class="badge"><?php echo e(\App\Products::all()->count()); ?></span> <span
-                                    class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="<?php echo e(url('/showproducts')); ?>"><i class="fa fa-list"></i> View Products</a></li>
-
-                            <li><a href="<?php echo e(url('/addproduct')); ?>"><i class="fa fa-btn fa-plus"></i> Add new Product</a>
-                            <li><a href="<?php echo e(url('/showcategory')); ?>"><i class="fa fa-th"></i> View Categories</a></li>
-                            <li><a href="<?php echo e(url('/addcategory')); ?>"><i class="fa fa-btn fa-plus"></i> Add new
-                                    category</a></li>
-                            </li>
-                            <li><a href="<?php echo e(url('/showproducts/woo')); ?>"><i class="fa fa-wordpress"></i> View WooCommerce Products</a></li>
-                            <li><a href="<?php echo e(url('/woo/addcategory')); ?>"><i class="fa fa-btn fa-wordpress"></i> Add WooCommerce
-                                    category</a></li>
-                            </li>
-                            <li><a href="<?php echo e(url('/woo/showcategory')); ?>"><i class="fa fa-btn fa-wordpress"></i> View WooCommerce categories</a></li>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Customers <span class="badge"><?php echo e(\App\Customers::all()->count()); ?></span><span
-                                    class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="<?php echo e(url('/customers')); ?>"><i class="fa fa-users"></i> Customers</a></li>
-
-                        </ul>
-                    </li>
-
-                    <li class="dropdown">
-                        <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            Bot <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="<?php echo e(url('/bot')); ?>"><i class="fa fa-rocket"></i> Bot replies</a></li>
-
-
-                        </ul>
-                    </li>
 
                     <?php if(Auth::user()->type == 'admin'): ?>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Site Settings <span
+                                        class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="<?php echo e(url('/settings/site')); ?>"><i class="fa fa-th"></i> Site Settings</a></li>
+<?php /*                                <li><a href="<?php echo e(url('/bot/settings')); ?>"><i class="fa fa-rocket"></i> Bot Settings</a>*/ ?>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
@@ -191,30 +119,145 @@
 
                             </ul>
                         </li>
-                    <?php endif; ?>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                            <?php echo e(Auth::user()->name); ?> <span class="caret"></span>
-                        </a>
 
-                        <ul class="dropdown-menu" role="menu">
-                            <?php if(Auth::user()->type == 'admin'): ?>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <?php echo e(Auth::user()->name); ?> <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+
+
+                                <li><a href="<?php echo e(url('/profile')); ?>"><i class="fa fa-user"></i> Profile</a></li>
+                                <li><a href="<?php echo e(url('/logout')); ?>"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                            </ul>
+                        </li>
+                    <?php else: ?>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+             <span
+                     class="badge"><?php echo e(\App\Http\Controllers\Data::getUnit()); ?> <?php echo e(\App\Income::sum('money')); ?></span>
+                                <span class="caret"></span>
+                                </span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="<?php echo e(url('/earning/history')); ?>"><i class="fa fa-money"></i> Earning
+                                        History</a>
+                                </li>
+                                <li><a href="<?php echo e(url('/earning/history/paypal')); ?>"><i class="fa fa-paypal"></i> Paypal
+                                        History</a>
+                                </li>
+
+
+                            </ul>
+
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" id="massMsg" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <i class="fa fa-envelope"></i> Mass Message </span>
+                            </a>
+
+
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Orders <span class="badge"><?php echo e(\App\Orders::where('status','pending')->count()); ?></span>
+                                <span
+                                        class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="<?php echo e(url('/orders')); ?>"><i class="fa fa-tag"></i> View Orders</a></li>
+                                <li><a href="<?php echo e(url('/orders/history')); ?>"><i class="fa fa-shopping-cart"></i> Orders
+                                        History</a></li>
+
+                            </ul>
+                        </li>
+
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Products <span class="badge"><?php echo e(\App\Products::all()->count()); ?></span> <span
+                                        class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="<?php echo e(url('/showproducts')); ?>"><i class="fa fa-list"></i> View Products</a>
+                                </li>
+
+                                <li><a href="<?php echo e(url('/addproduct')); ?>"><i class="fa fa-btn fa-plus"></i> Add new Product</a>
+                                <li><a href="<?php echo e(url('/showcategory')); ?>"><i class="fa fa-th"></i> View Categories</a>
+                                </li>
+                                <li><a href="<?php echo e(url('/addcategory')); ?>"><i class="fa fa-btn fa-plus"></i> Add new
+                                        category</a></li>
+                                </li>
+                                <li><a href="<?php echo e(url('/showproducts/woo')); ?>"><i class="fa fa-wordpress"></i> View
+                                        WooCommerce Products</a></li>
+                                <li><a href="<?php echo e(url('/woo/addcategory')); ?>"><i class="fa fa-btn fa-wordpress"></i> Add
+                                        WooCommerce
+                                        category</a></li>
+                                </li>
+                                <li><a href="<?php echo e(url('/woo/showcategory')); ?>"><i class="fa fa-btn fa-wordpress"></i> View
+                                        WooCommerce categories</a></li>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Customers <span class="badge"><?php echo e(\App\Customers::all()->count()); ?></span><span
+                                        class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="<?php echo e(url('/customers')); ?>"><i class="fa fa-users"></i> Customers</a></li>
+
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                Bot <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="<?php echo e(url('/bot')); ?>"><i class="fa fa-rocket"></i> Bot replies</a></li>
+
+
+                            </ul>
+                        </li>
+
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-expanded="false">
+                                <?php echo e(Auth::user()->name); ?> <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu" role="menu">
+
                                 <li><a href="<?php echo e(url('/settings')); ?>"><i class="fa fa-gear"></i> Settings</a></li>
-                                <li><a href="<?php echo e(url('/bot/settings')); ?>"><i class="fa fa-rocket"></i> Bot Settings</a></li>
-                            <?php endif; ?>
-                            <li><a href="<?php echo e(url('/profile')); ?>"><i class="fa fa-user"></i> Profile</a></li>
-                            <li><a href="<?php echo e(url('/logout')); ?>"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
-                        </ul>
-                    </li>
+                                <li><a href="<?php echo e(url('/profile')); ?>"><i class="fa fa-user"></i> Profile</a></li>
+                                <li><a href="<?php echo e(url('/logout')); ?>"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                            </ul>
+                        </li>
 
-                    <li class="dropdown">
-                        <a href="<?php echo e(url('/notifications')); ?>" id="massMsg" class="dropdown-toggle" role="button"
-                          >
-                            <i class="fa fa-bell"><sup><b><?php echo e(\App\Notifications::count()); ?></b></sup></i>
-                        </a>
+                        <li class="dropdown">
+                            <a href="<?php echo e(url('/notifications')); ?>" id="massMsg" class="dropdown-toggle" role="button"
+                            >
+                                <i class="fa fa-bell"><sup><b><?php echo e(\App\Notifications::count()); ?></b></sup></i>
+                            </a>
 
 
-                    </li>
+                        </li>
+                    <?php endif; ?>
                 <?php endif; ?>
             </ul>
         </div>

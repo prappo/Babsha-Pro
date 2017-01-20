@@ -9,6 +9,7 @@ use Facebook\Facebook;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\Auth;
 
 class Products extends Controller
 {
@@ -104,6 +105,8 @@ class Products extends Controller
                 $product->category = $category;
                 $product->status = "published";
                 $product->featured = $featured;
+                $product->userId = Auth::user()->id;
+                $product->pageId = $re->pageId;
                 $product->save();
                 Customer::sendProductNotification($re->title,$re->shortDescription,$re->image,Data::getUnit().$re->price);
 
@@ -171,6 +174,8 @@ class Products extends Controller
             $product->category = $category;
             $product->status = "published";
             $product->featured = $featured;
+            $product->userId = Auth::user()->id;
+            $product->pageId = $re->pageId;
             $product->save();
             Customer::sendProductNotification($re->title,$re->shortDescription,$re->image,Data::getUnit().$re->price);
             return "success";

@@ -1,6 +1,5 @@
-@extends('layouts.app')
-@section('title','Update user')
-@section('content')
+<?php $__env->startSection('title','Update user'); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
@@ -10,9 +9,9 @@
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <label for="name" class="col-md-4 control-label">Name</label>
-                                <input id="userId" type="hidden" value="{{$id}}">
+                                <input id="userId" type="hidden" value="<?php echo e($id); ?>">
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control" value="{{$name}}" id="name">
+                                    <input type="text" class="form-control" value="<?php echo e($name); ?>" id="name">
 
                                 </div>
                             </div>
@@ -20,7 +19,7 @@
                                 <label for="email" class="col-md-4 control-label">Email</label>
 
                                 <div class="col-md-6">
-                                    <input type="email" class="form-control" value="{{$email}}"  id="email">
+                                    <input type="email" class="form-control" value="<?php echo e($email); ?>"  id="email">
 
                                 </div>
                             </div>
@@ -46,21 +45,21 @@
 
                                     <div class="checkbox">
                                         <label>
-                                            <input id="woo" @if(\App\UserPackages::where('userId',$id)->value('woo')=="yes") checked @endif type="checkbox">
+                                            <input id="woo" <?php if(\App\UserPackages::where('userId',$id)->value('woo')=="yes"): ?> checked <?php endif; ?> type="checkbox">
                                              WooCommerce
                                         </label>
                                     </div>
 
                                     <div class="checkbox">
                                         <label>
-                                            <input id="shopify" @if(\App\UserPackages::where('userId',$id)->value('shopify')=="yes") checked @endif type="checkbox">
+                                            <input id="shopify" <?php if(\App\UserPackages::where('userId',$id)->value('shopify')=="yes"): ?> checked <?php endif; ?> type="checkbox">
                                              Shopify
                                         </label>
                                     </div>
 
                                     <div class="checkbox">
                                         <label>
-                                            <input id="magento" @if(\App\UserPackages::where('userId',$id)->value('magento')=="yes") checked @endif type="checkbox">
+                                            <input id="magento" <?php if(\App\UserPackages::where('userId',$id)->value('magento')=="yes"): ?> checked <?php endif; ?> type="checkbox">
                                              Magento
                                         </label>
                                     </div>
@@ -82,9 +81,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('js')
+<?php $__env->startSection('js'); ?>
     <script>
 
         $('#update').click(function () {
@@ -100,7 +99,7 @@
             }
             $.ajax({
                 type: 'POST',
-                url: '{{url('/user/edit')}}',
+                url: '<?php echo e(url('/user/edit')); ?>',
                 data: {
                     'id':$('#userId').val(),
                     'name': $('#name').val(),
@@ -121,4 +120,6 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

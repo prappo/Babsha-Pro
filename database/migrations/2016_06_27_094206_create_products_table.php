@@ -23,6 +23,8 @@ class CreateProductsTable extends Migration
             $table->string('status');
             $table->string('category');
             $table->string('featured');
+            $table->string('userId');
+            $table->string('pageId');
             $table->timestamps();
         });
     }

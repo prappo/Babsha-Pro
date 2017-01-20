@@ -16,6 +16,8 @@ class CreateBotsTable extends Migration
             $table->increments('id');
             $table->string('message');
             $table->string('reply');
+            $table->string('userId');
+            $table->string('pageId');
             $table->timestamps();
         });
     }

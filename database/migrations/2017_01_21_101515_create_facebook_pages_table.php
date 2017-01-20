@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateCatagoriesTable extends Migration
+class CreateFacebookPagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,12 @@ class CreateCatagoriesTable extends Migration
      */
     public function up()
     {
-        Schema::create('catagories', function (Blueprint $table) {
+        Schema::create('facebook_pages', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
             $table->string('userId');
+            $table->string('pageId');
+            $table->string('pageName');
+            $table->string('pageToken');
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateCatagoriesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('catagories');
+        Schema::drop('facebook_pages');
     }
 }

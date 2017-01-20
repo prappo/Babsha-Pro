@@ -1,6 +1,5 @@
-@extends('layouts.app')
-@section('title','Add user')
-@section('content')
+<?php $__env->startSection('title','Add user'); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
@@ -80,9 +79,9 @@
         </div>
     </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('js')
+<?php $__env->startSection('js'); ?>
     <script>
 
         $('#adduser').click(function () {
@@ -98,7 +97,7 @@
             }
             $.ajax({
                 type: 'POST',
-                url: '{{url('/user/add')}}',
+                url: '<?php echo e(url('/user/add')); ?>',
                 data: {
                     'name': $('#name').val(),
                     'email': $('#email').val(),
@@ -118,4 +117,6 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

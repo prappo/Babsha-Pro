@@ -16,6 +16,7 @@ class CreateIncomesTable extends Migration
             $table->increments('id');
             $table->string("orderid");
             $table->integer('money');
+            $table->string('userId');
             $table->timestamps();
         });
     }

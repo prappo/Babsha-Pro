@@ -20,6 +20,8 @@ class CreateCartsTable extends Migration
             $table->string('status');
             $table->integer('price');
             $table->string('type');
+            $table->string('pageId');
+            $table->string('userId');
             $table->timestamps();
         });
     }

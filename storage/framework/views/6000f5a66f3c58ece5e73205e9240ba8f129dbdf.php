@@ -1,6 +1,5 @@
-@extends('layouts.app')
-@section('title','Add new Product')
-@section('content')
+<?php $__env->startSection('title','Add new Product'); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row">
             <div class="col-md-8 col-md-offset-2">
@@ -14,9 +13,9 @@
 
                                 <div class="col-md-6">
                                     <select class="form-control" id="pageId">
-                                        @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fbPage)
-                                            <option value="{{$fbPage->pageId}}">{{$fbPage->pageName}}</option>
-                                        @endforeach
+                                        <?php foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fbPage): ?>
+                                            <option value="<?php echo e($fbPage->pageId); ?>"><?php echo e($fbPage->pageName); ?></option>
+                                        <?php endforeach; ?>
                                     </select>
 
                                 </div>
@@ -79,14 +78,14 @@
 
                                 <div class="col-md-6">
                                     <select class="form-control" id="category">
-                                        @foreach($categories as $category)
-                                            <option value="{{$category->name}}">{{$category->name}}</option>
-                                        @endforeach
-                                        @if($wooCategories != "none")
-                                            @foreach($wooCategories as $wc)
-                                                <option value="{{$wc['id']}}">{{$wc['name']}} ( WooCommerce )</option>
-                                            @endforeach
-                                        @endif
+                                        <?php foreach($categories as $category): ?>
+                                            <option value="<?php echo e($category->name); ?>"><?php echo e($category->name); ?></option>
+                                        <?php endforeach; ?>
+                                        <?php if($wooCategories != "none"): ?>
+                                            <?php foreach($wooCategories as $wc): ?>
+                                                <option value="<?php echo e($wc['id']); ?>"><?php echo e($wc['name']); ?> ( WooCommerce )</option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
                                     </select>
 
                                 </div>
@@ -147,9 +146,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('js')
+<?php $__env->startSection('js'); ?>
     <script>
 
         $("#uploadimage").on('submit', (function (e) {
@@ -157,7 +156,7 @@
             $('#imgMsg').html("Please wait ...");
             $.ajax({
                 type: "POST",
-                url: "{{url('/iup')}}",
+                url: "<?php echo e(url('/iup')); ?>",
                 data: new FormData(this),
                 contentType: false,
                 cache: false,
@@ -193,7 +192,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: '{{url('/addproduct')}}',
+                url: '<?php echo e(url('/addproduct')); ?>',
                 data: {
                     'title': $('#title').val(),
                     'shortDescription': $('#shortDescription').val(),
@@ -203,8 +202,7 @@
                     'category': $('#category').val(),
                     'featured': $('#featured').val(),
                     'postFb': postFb,
-                    'postWp': postWp,
-                    'pageId':$('#pageId').val()
+                    'postWp': postWp
                 },
                 success: function (data) {
                     console.log(data);
@@ -217,4 +215,6 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
