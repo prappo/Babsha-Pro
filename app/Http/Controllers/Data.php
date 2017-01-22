@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Customers;
+use App\FacebookPages;
 use App\Notifications;
 use App\Translate;
 use Illuminate\Http\Request;
@@ -17,9 +18,9 @@ class Data extends Controller
      * @return mixed
      * @Facebook page token
      */
-    public static function getToken()
+    public static function getToken($pageId)
     {
-        return Settings::get('token');
+        return FacebookPages::where('pageId',$pageId)->value('pageToken');
     }
 
     /**

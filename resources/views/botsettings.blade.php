@@ -9,6 +9,16 @@
                     <div class="panel-body">
                         <div class="form-horizontal">
                             <div class="form-group">
+                                <label for="pageId" class="col-md-4 control-label">Select page</label>
+                                <div class="col-md-6">
+                                    <select class="form-control" id="pageId">
+                                        @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $page)
+                                            <option value="{{$page->pageId}}">{{$page->pageName}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label for="name" class="col-md-4 control-label">Greeting Message</label>
 
                                 <div class="col-md-6">
@@ -20,7 +30,7 @@
                             <div class="form-group">
                                 <div class="col-md-6 col-md-offset-4">
                                     <button id="update" class="btn btn-primary">
-                                        <i class="fa fa-btn fa-save"></i> Update
+                                        <i class="fa fa-btn fa-save"></i> Update Message and setup menu
                                     </button>
                                 </div>
                             </div>
@@ -41,13 +51,14 @@
                 type: 'POST',
                 url: '{{url('/bot/settings')}}',
                 data: {
-                    'message': $('#message').val()
+                    'message': $('#message').val(),
+                    'pageId':$('#pageId').val()
                 },
                 success: function (data) {
-                    swal("Success",'Done !',"success");
+                    swal("Success", 'Done !', "success");
                 },
-                error:function (data) {
-                    swal('error',data,'error');
+                error: function (data) {
+                    swal('error', data, 'error');
                 }
             });
         });

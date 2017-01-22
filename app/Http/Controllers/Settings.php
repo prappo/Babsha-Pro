@@ -207,7 +207,7 @@ class Settings extends Controller
 
     public function botUpdate(Request $request)
     {
-
+        $pageId = $request->pageId;
         if ($request->message == "") {
             $message = "Welcome to my Shop";
         } else {
@@ -267,10 +267,10 @@ class Settings extends Controller
   "domain_action_type": "add"
 }';
 
-        Boot::thread($jsonGetStartBtn);
-        Boot::thread($jsonGreeting);
-        Boot::thread($jsonMenu);
-        Boot::thread($jsonWhitelist);
+        Boot::thread($jsonGetStartBtn,$pageId);
+        Boot::thread($jsonGreeting,$pageId);
+        Boot::thread($jsonMenu,$pageId);
+        Boot::thread($jsonWhitelist,$pageId);
 
 
     }

@@ -102,7 +102,7 @@
 
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="<?php echo e(url('/settings/site')); ?>"><i class="fa fa-th"></i> Site Settings</a></li>
-<?php /*                                <li><a href="<?php echo e(url('/bot/settings')); ?>"><i class="fa fa-rocket"></i> Bot Settings</a>*/ ?>
+
                                 </li>
                             </ul>
                         </li>
@@ -138,7 +138,7 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
              <span
-                     class="badge"><?php echo e(\App\Http\Controllers\Data::getUnit()); ?> <?php echo e(\App\Income::sum('money')); ?></span>
+                     class="badge"><?php echo e(\App\Http\Controllers\Data::getUnit()); ?> <?php echo e(\App\Income::where('userId',Auth::user()->id)->sum('money')); ?></span>
                                 <span class="caret"></span>
                                 </span>
                             </a>
@@ -167,7 +167,7 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
-                                Orders <span class="badge"><?php echo e(\App\Orders::where('status','pending')->count()); ?></span>
+                                Orders <span class="badge"><?php echo e(\App\Orders::where('userId',Auth::user()->id)->where('status','pending')->count()); ?></span>
                                 <span
                                         class="caret"></span>
                             </a>
@@ -230,7 +230,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="<?php echo e(url('/bot')); ?>"><i class="fa fa-rocket"></i> Bot replies</a></li>
 
-
+                                <li><a href="<?php echo e(url('/bot/settings')); ?>"><i class="fa fa-gear"></i> Bot Settings</a>
                             </ul>
                         </li>
 

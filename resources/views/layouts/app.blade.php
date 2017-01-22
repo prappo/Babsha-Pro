@@ -101,7 +101,7 @@
 
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{{url('/settings/site') }}"><i class="fa fa-th"></i> Site Settings</a></li>
-                                {{--                                <li><a href="{{url('/bot/settings') }}"><i class="fa fa-rocket"></i> Bot Settings</a>--}}
+
                                 </li>
                             </ul>
                         </li>
@@ -183,7 +183,7 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
-                                Products <span class="badge">{{\App\Products::where('userId',Auth::user()->id)->count()}}</span> <span
+                                Products <span class="badge">{{\App\Products::all()->count()}}</span> <span
                                         class="caret"></span>
                             </a>
 
@@ -212,7 +212,7 @@
                         <li class="dropdown">
                             <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
-                                Customers <span class="badge">{{\App\Customers::awhere('userId',Auth::user()->id)->count()}}</span><span
+                                Customers <span class="badge">{{\App\Customers::all()->count()}}</span><span
                                         class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" role="menu">
@@ -229,7 +229,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="{{url('/bot')}}"><i class="fa fa-rocket"></i> Bot replies</a></li>
 
-
+                                <li><a href="{{url('/bot/settings') }}"><i class="fa fa-gear"></i> Bot Settings</a>
                             </ul>
                         </li>
 
@@ -251,7 +251,7 @@
                         <li class="dropdown">
                             <a href="{{url('/notifications')}}" id="massMsg" class="dropdown-toggle" role="button"
                             >
-                                <i class="fa fa-bell"><sup><b>{{\App\Notifications::where('userId',Auth::user()->id)->count()}}</b></sup></i>
+                                <i class="fa fa-bell"><sup><b>{{\App\Notifications::count()}}</b></sup></i>
                             </a>
 
 

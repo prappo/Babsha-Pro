@@ -17,7 +17,7 @@ class Boot extends Controller
     {
         $json = '"setting_type":"greeting",
   "greeting":{
-    "text":"Welcome to our shop"
+    "text":"Welcome to our shop"    
   }';
         return $json;
     }
@@ -72,9 +72,9 @@ class Boot extends Controller
         return $json;
     }
 
-    public static function thread($jsonData)
+    public static function thread($jsonData,$pageId)
     {
-        $url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=' . Data::getToken();
+        $url = 'https://graph.facebook.com/v2.6/me/thread_settings?access_token=' . Data::getToken($pageId);
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_POST, 1);
