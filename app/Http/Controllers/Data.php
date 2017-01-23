@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Customers;
 use App\FacebookPages;
 use App\Notifications;
+use App\SiteSettings;
 use App\Translate;
 use Illuminate\Http\Request;
 
@@ -51,7 +52,7 @@ class Data extends Controller
      */
     public static function getAppId()
     {
-        return Settings::get('appId');
+        return SiteSettings::where('key','appId')->value('value');
     }
 
     /**
@@ -60,7 +61,7 @@ class Data extends Controller
      */
     public static function getAppSec()
     {
-        return Settings::get('appSec');
+        return SiteSettings::where('key','appSec')->value('value');
     }
 
     /**

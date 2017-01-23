@@ -40,6 +40,23 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Select a page to subscribe for Bot</div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fb)
+                                <li class="list-group-item"><a target="_blank" href="{{url('/bot/subscribe/')}}/{{$fb->pageId}}">{{$fb->pageName}}</a></li>
+                            @endforeach
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -52,7 +69,7 @@
                 url: '{{url('/bot/settings')}}',
                 data: {
                     'message': $('#message').val(),
-                    'pageId':$('#pageId').val()
+                    'pageId': $('#pageId').val()
                 },
                 success: function (data) {
                     swal("Success", 'Done !', "success");

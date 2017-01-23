@@ -92,6 +92,6 @@ Route::get('/woo/showcategory','WooController@viewCategory');
 Route::post('/woo/addcategory','WooController@addCategory');
 Route::post('/woo/category/edit','WooController@editCategory');
 Route::post('/woo/category/delete','WooController@deleteCategory');
-
+Route::get('/bot/subscribe/{pageId}','Prappo@subscribe');
 
 

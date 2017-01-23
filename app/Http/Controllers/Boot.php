@@ -82,4 +82,6 @@ class Boot extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
         curl_exec($ch);
     }
+
+
 }

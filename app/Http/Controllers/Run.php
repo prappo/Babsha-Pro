@@ -154,6 +154,7 @@ class Run extends Controller
                         $customer->state = "none";
                         $customer->mobile = "none";
                         $customer->lang = $lang;
+                        $customer->pageId = $pageId;
                         $customer->save();
                         $msg = "Hello " . $user->first_name . "\nCheck out our menu . If you need more help please type 'help'";
                     }
@@ -207,11 +208,7 @@ class Run extends Controller
                                 exit;
                             }
                         }
-//                        update customers default language settings
-                        try {
-                            Customers::where('fbId', $sender)->update(['lang' => $lang]);
-                        } catch (\Exception $e) {
-                        }
+//
 
 
                         $msgArr = ["Oops, I didn't catch that. For things I can help you with, type 'help' or check out our menu.", "I’m sorry; I’m not sure I understand. Try typing 'help' or check out our menu"];

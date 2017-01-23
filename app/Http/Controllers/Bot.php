@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Support\Facades\Auth;
 
 class Bot extends Controller
 {
@@ -13,7 +14,7 @@ class Bot extends Controller
         $this->middleware('auth');
     }
     public function index(){
-        $data = \App\Bot::all();
+        $data = \App\Bot::where('userId',Auth::user()->id)->get();
         return view('bot',compact('data'));
     }
 
@@ -22,6 +23,8 @@ class Bot extends Controller
             $bot = new \App\Bot();
             $bot->message = $request->message;
             $bot->reply = $request->reply;
+            $bot->pageId = $request->pageId;
+            $bot->userId = Auth::user()->id;
             $bot->save();
             return "success";
         }

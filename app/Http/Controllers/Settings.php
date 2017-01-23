@@ -96,15 +96,18 @@ class Settings extends Controller
             $response = $fb->get('me/accounts', $accessToken);
             $body = $response->getBody();
             $data = json_decode($body, true);
-            FacebookPages::truncate();
+            print_r($data);
+            exit;
             foreach ($data['data'] as $no => $filed) {
+                if(!FacebookPages::where('pageId',$filed['id'])->exists()){
+                    $facebookPages = new FacebookPages();
+                    $facebookPages->pageId = $filed['id'];
+                    $facebookPages->pageName = $filed['name'];
+                    $facebookPages->pageToken = $filed['access_token'];
+                    $facebookPages->userId = Auth::user()->id;
+                    $facebookPages->save();
+                }
 
-                $facebookPages = new FacebookPages();
-                $facebookPages->pageId = $filed['id'];
-                $facebookPages->pageName = $filed['name'];
-                $facebookPages->pageToken = $filed['access_token'];
-                $facebookPages->userId = Auth::user()->id;
-                $facebookPages->save();
 
             }
 

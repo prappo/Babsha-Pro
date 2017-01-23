@@ -40,7 +40,7 @@ class Products extends Controller
             $wooCategories = "none";
         }
 
-        $categories = Catagories::all();
+        $categories = Catagories::where('userId',Auth::user()->id)->get();
 
         return view('addproduct', compact('categories','wooCategories'));
     }
@@ -76,14 +76,15 @@ class Products extends Controller
 
 
 
-        $pageToken = Data::getToken();
-        $fb = new Facebook([
-            'app_id' => Data::getAppId(),
-            'app_secret' => Data::getAppSec(),
-            'default_graph_version' => 'v2.6',
-        ]);
+
 
         if($re->postFb == 'yes'){
+            $pageToken = Data::getToken($re->pageId);
+            $fb = new Facebook([
+                'app_id' => Data::getAppId(),
+                'app_secret' => Data::getAppSec(),
+                'default_graph_version' => 'v2.6',
+            ]);
             $data = $title."\n".$shortDescription."\n".$longDescription."\n".Data::getUnit().$price;
             $content = [
                 "message" => $data,
@@ -189,7 +190,7 @@ class Products extends Controller
      */
     public function showProducts()
     {
-        $data = \App\Products::paginate(10);
+        $data = \App\Products::where('userId',Auth::user()->id)->paginate(10);
         return view('showproducts', compact('data'));
     }
 

@@ -10,6 +10,20 @@
                     <div class="form-horizontal">
 
                         <div class="form-group">
+                            <label for="pageId" class="col-md-2 control-label">Select Page</label>
+
+                            <div class="col-md-4">
+                                <select id="pageId" class="form-control">
+                                    @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $page)
+                                        <option value="{{$page->pageId}}">{{$page->pageName}}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
                             <label for="message" class="col-md-2 control-label">Message</label>
 
                             <div class="col-md-4">
@@ -58,7 +72,8 @@
                                     <td>{{$d->message}}</td>
                                     <td>{{$d->reply}}</td>
                                     <td>
-                                        <button data-id="{{$d->id}}" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i>
+                                        <button data-id="{{$d->id}}" class="btn btn-xs btn-danger"><i
+                                                    class="fa fa-trash"></i>
                                             Delete
                                         </button>
                                     </td>
@@ -100,16 +115,17 @@
                 type: 'POST',
                 url: '{{url('/bot/add')}}',
                 data: {
-                    'message':$('#message').val(),
-                    'reply':$('#reply').val()
+                    'message': $('#message').val(),
+                    'reply': $('#reply').val(),
+                    'pageId':$('#pageId').val()
                 },
-                success:function (data) {
-                    if(data=='success'){
-                        swal('Success','Added','success');
+                success: function (data) {
+                    if (data == 'success') {
+                        swal('Success', 'Added', 'success');
                         location.reload();
                     }
-                    else{
-                        swal('Error',data,'error');
+                    else {
+                        swal('Error', data, 'error');
                     }
                 }
             });

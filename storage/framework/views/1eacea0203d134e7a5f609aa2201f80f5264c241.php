@@ -9,6 +9,20 @@
                     <div class="form-horizontal">
 
                         <div class="form-group">
+                            <label for="pageId" class="col-md-2 control-label">Select Page</label>
+
+                            <div class="col-md-4">
+                                <select id="pageId" class="form-control">
+                                    <?php foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $page): ?>
+                                        <option value="<?php echo e($page->pageId); ?>"><?php echo e($page->pageName); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
                             <label for="message" class="col-md-2 control-label">Message</label>
 
                             <div class="col-md-4">
@@ -57,7 +71,8 @@
                                     <td><?php echo e($d->message); ?></td>
                                     <td><?php echo e($d->reply); ?></td>
                                     <td>
-                                        <button data-id="<?php echo e($d->id); ?>" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i>
+                                        <button data-id="<?php echo e($d->id); ?>" class="btn btn-xs btn-danger"><i
+                                                    class="fa fa-trash"></i>
                                             Delete
                                         </button>
                                     </td>
@@ -99,16 +114,17 @@
                 type: 'POST',
                 url: '<?php echo e(url('/bot/add')); ?>',
                 data: {
-                    'message':$('#message').val(),
-                    'reply':$('#reply').val()
+                    'message': $('#message').val(),
+                    'reply': $('#reply').val(),
+                    'pageId':$('#pageId').val()
                 },
-                success:function (data) {
-                    if(data=='success'){
-                        swal('Success','Added','success');
+                success: function (data) {
+                    if (data == 'success') {
+                        swal('Success', 'Added', 'success');
                         location.reload();
                     }
-                    else{
-                        swal('Error',data,'error');
+                    else {
+                        swal('Error', data, 'error');
                     }
                 }
             });

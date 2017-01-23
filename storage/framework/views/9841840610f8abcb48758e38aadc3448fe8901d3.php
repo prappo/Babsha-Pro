@@ -39,6 +39,23 @@
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Select a page to subscribe for Bot</div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <?php foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fb): ?>
+                                <li class="list-group-item"><a target="_blank" href="<?php echo e(url('/bot/subscribe/')); ?>/<?php echo e($fb->pageId); ?>"><?php echo e($fb->pageName); ?></a></li>
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 <?php $__env->stopSection(); ?>
 
@@ -50,7 +67,8 @@
                 type: 'POST',
                 url: '<?php echo e(url('/bot/settings')); ?>',
                 data: {
-                    'message': $('#message').val()
+                    'message': $('#message').val(),
+                    'pageId': $('#pageId').val()
                 },
                 success: function (data) {
                     swal("Success", 'Done !', "success");

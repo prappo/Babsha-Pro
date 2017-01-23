@@ -202,7 +202,8 @@
                     'category': $('#category').val(),
                     'featured': $('#featured').val(),
                     'postFb': postFb,
-                    'postWp': postWp
+                    'postWp': postWp,
+                    'pageId':$('#pageId').val()
                 },
                 success: function (data) {
                     console.log(data);
