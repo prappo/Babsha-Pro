@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Customers;
+use App\FacebookPages;
 use App\Subscribe;
 use Illuminate\Http\Request;
 
@@ -56,6 +57,7 @@ class Customer extends Controller
         $state = $re->state;
         $country = $re->country;
         $postal_code = $re->postal_code;
+        $pageId = $re->pageId;
         try {
             Customers::where('fbId', $fbId)->update([
                 'name' => $name,
@@ -66,7 +68,7 @@ class Customer extends Controller
                 'country' => $country,
                 'postal_code' => $postal_code
             ]);
-            Run::fire(Send::sendMessage($fbId,"Thank you for updating shipping information"));
+            Run::fire(Send::sendMessage($fbId,"Thank you for updating shipping information"),$pageId);
             return "success";
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -78,7 +80,7 @@ class Customer extends Controller
      * @param $sender
      * @return string
      */
-    public static function subscribe($sender)
+    public static function subscribe($sender,$pageId)
     {
         if (Subscribe::where('fbId', $sender)->exists()) {
             $status = Subscribe::where('fbId', $sender)->value('status');
@@ -102,7 +104,9 @@ class Customer extends Controller
             }
         } else {
             $subscribe = new Subscribe();
+            $userId = FacebookPages::where('pageId',$pageId)->value('userId');
             $subscribe->fbId = $sender;
+            $subscribe->userId = $userId;
             $subscribe->status = "yes";
             $subscribe->save();
             return "Successfully subscribed";
@@ -116,12 +120,12 @@ class Customer extends Controller
      * @param $image
      * @param $price
      */
-    public static function sendProductNotification($title, $shortDescription, $image, $price)
+    public static function sendProductNotification($title, $shortDescription, $image, $price,$pageId)
     {
         foreach (Subscribe::where('status', 'yes')->get() as $user) {
-            Run::fire(Send::sendText($user->fbId,"New product added"));
-            Run::fire(Send::sendImage($user->fbId,url('/uploads') . "/" . $image));
-            Run::fire(Send::sendText($user->fbId, $title  . "\n" . $shortDescription . "\n" . $price));
+            Run::fire(Send::sendText($user->fbId,"New product added"),$pageId);
+            Run::fire(Send::sendImage($user->fbId,url('/uploads') . "/" . $image),$pageId);
+            Run::fire(Send::sendText($user->fbId, $title  . "\n" . $shortDescription . "\n" . $price),$pageId);
         }
     }
 
@@ -132,10 +136,11 @@ class Customer extends Controller
     public function notify(Request $re)
     {
         $msg = $re->msg;
+        $pageId = $re->pageId;
         try {
             $customers = Customers::all();
             foreach ($customers as $customer) {
-                Run::fire(Send::sendMessage($customer->fbId, $msg));
+                Run::fire(Send::sendMessage($customer->fbId, $msg),$pageId);
             }
         } catch (\Exception $e) {
             return "Something went wrong please try again later";

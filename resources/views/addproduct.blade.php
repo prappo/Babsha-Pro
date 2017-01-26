@@ -9,18 +9,20 @@
                     <div class="panel-body">
                         <div class="form-horizontal">
 
+
                             <div class="form-group">
-                                <label for="title" class="col-md-4 control-label">For</label>
+                                <label for="pageId" class="col-md-4 control-label">Product For</label>
 
                                 <div class="col-md-6">
-                                    <select class="form-control" id="pageId">
-                                        @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fbPage)
-                                            <option value="{{$fbPage->pageId}}">{{$fbPage->pageName}}</option>
-                                        @endforeach
+                                    <select id="pageId" class="form-control">
+                                        @foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $p)
+                                        <option value="{{$p->pageId}}">{{$p->pageName}}</option>
+                                            @endforeach
                                     </select>
 
                                 </div>
                             </div>
+
                             <div class="form-group">
                                 <label for="title" class="col-md-4 control-label">Product Title</label>
 
@@ -106,18 +108,31 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="postFb" class="col-md-4 control-label">Post On Facebook</label>
+                            {{--<div class="form-group">--}}
+                                {{--<label for="postFb" class="col-md-4 c`ontrol-label">Post On Facebook</label>--}}
 
-                                <div class="col-md-6">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input id="postFb" type="checkbox"> Yes
-                                        </label>
-                                    </div>
+                                {{--<div class="col-md-6">--}}
+                                    {{--<div class="checkbox">--}}
+                                        {{--<label>--}}
+                                            {{--<input id="postFb" type="checkbox"> Yes--}}
+                                        {{--</label>--}}
+                                    {{--</div>--}}
 
-                                </div>
-                            </div>
+                                {{--</div>--}}
+                            {{--</div>--}}
+
+                            {{--<div class="form-group">--}}
+                                {{--<label for="pageId" class="col-md-4 control-label">For</label>--}}
+
+                                {{--<div class="col-md-6">--}}
+                                    {{--<select class="form-control" id="pageId">--}}
+                                        {{--@foreach(\App\FacebookPages::where('userId',Auth::user()->id)->get() as $fbPage)--}}
+                                            {{--<option value="{{$fbPage->pageId}}">{{$fbPage->pageName}}</option>--}}
+                                        {{--@endforeach--}}
+                                    {{--</select>--}}
+
+                                {{--</div>--}}
+                            {{--</div>--}}
 
                             <div class="form-group">
                                 <label for="postWp" class="col-md-4 control-label">Create WooCommerce Product</label>

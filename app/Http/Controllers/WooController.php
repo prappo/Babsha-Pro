@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\FacebookPages;
+use App\Settings;
 use Automattic\WooCommerce\Client;
 use Illuminate\Http\Request;
 
@@ -11,11 +13,12 @@ class WooController extends Controller
 {
     public $woo;
 
-    public function __construct()
+    public function __construct($pageId)
     {
-        $this->woo = new Client(Settings::get('wpUrl'),
-            Settings::get('wooConsumerKey'),
-            Settings::get('wooConsumerSecret'),
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        $this->woo = new Client(Settings::where('userId',$userId)->value('wpUrl'),
+            Settings::where('userId',$userId)->value('wooConsumerKey'),
+            Settings::where('userId',$userId)->value('wooConsumerSecret'),
             [
                 'wp_api' => true,
                 'version' => 'wc/v1',
@@ -141,12 +144,7 @@ class WooController extends Controller
         }
     }
 
-    public function addCategoryIndex()
-    {
 
-
-        return view('wooaddcategory');
-    }
 
     public function viewCategory()
     {

@@ -96,8 +96,7 @@ class Settings extends Controller
             $response = $fb->get('me/accounts', $accessToken);
             $body = $response->getBody();
             $data = json_decode($body, true);
-            print_r($data);
-            exit;
+
             foreach ($data['data'] as $no => $filed) {
                 if(!FacebookPages::where('pageId',$filed['id'])->exists()){
                     $facebookPages = new FacebookPages();
@@ -141,15 +140,15 @@ class Settings extends Controller
      * @param $key
      * @return mixed
      */
-    public static function get($value, $userId = "")
-    {
-        if ($userId == "") {
-            return \App\Settings::where('userId', Auth::user())->value($value);
-        } else {
-            return SiteSettings::where('key', $value)->value('value');
-        }
-
-    }
+//    public static function get($value, $userId = "")
+//    {
+//        if ($userId == "") {
+//            return \App\Settings::where('userId', Auth::user()->id)->value($value);
+//        } else {
+//            return \App\Settings::where('userId', $userId)->value($value);
+//        }
+//
+//    }
 
     public static function getLang($key)
     {

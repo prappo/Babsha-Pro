@@ -87,7 +87,7 @@ Route::get('/showproducts/woo', 'WooController@viewProducts');
 Route::get('/woo/update/product/{id}', 'WooController@updateProduct');
 Route::post('/woo/delete/product', 'WooController@deleteProduct');
 Route::post('/woo/update/product', 'WooController@updateWooProduct');
-Route::get('/woo/addcategory','WooController@addCategoryIndex');
+Route::get('/woo/addcategory','Category@wooAddCategoryIndex');
 Route::get('/woo/showcategory','WooController@viewCategory');
 Route::post('/woo/addcategory','WooController@addCategory');
 Route::post('/woo/category/edit','WooController@editCategory');

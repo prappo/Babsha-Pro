@@ -16,6 +16,7 @@ class CreateCatagoriesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('userId');
+            $table->string('pageId');
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Customers;
 use App\FacebookPages;
 use App\Notifications;
+use App\Settings;
 use App\SiteSettings;
 use App\Translate;
 use Illuminate\Http\Request;
@@ -46,44 +47,29 @@ class Data extends Controller
 
     }
 
-    /**
-     * @return mixed
-     * @Facebook App ID
-     */
-    public static function getAppId()
-    {
-        return SiteSettings::where('key','appId')->value('value');
-    }
 
-    /**
-     * @return mixed
-     * @Facebook App Secrete
-     */
-    public static function getAppSec()
-    {
-        return SiteSettings::where('key','appSec')->value('value');
-    }
 
     /**
      * @return mixed
      */
-    public static function getCurrency()
+    public static function getCurrency($pageId)
     {
-        return Settings::get('currency');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('currency');
     }
 
     /**
      * @return string
      */
-    public static function getUnit()
+    public static function getUnit($pageId)
     {
-        if (self::getCurrency() == 'USD') {
+        if (self::getCurrency($pageId) == 'USD') {
             return "\$";
-        } elseif (self::getCurrency() == 'EURO') {
+        } elseif (self::getCurrency($pageId) == 'EURO') {
             return "€";
-        } elseif (self::getCurrency() == 'BDT') {
+        } elseif (self::getCurrency($pageId) == 'BDT') {
             return "৳";
-        } elseif (self::getCurrency() == 'GBP') {
+        } elseif (self::getCurrency($pageId) == 'GBP') {
             return "£";
         } else {
             return "\$";
@@ -94,25 +80,32 @@ class Data extends Controller
     /**
      * @return mixed
      */
-    public static function getPaymentMethod()
+    public static function getPaymentMethod($pageId)
     {
-        return Settings::get('paymentMethod');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('paymentMethod');
+//        return Settings::get('paymentMethod');
     }
 
-    public static function getPaypalAccount()
+    public static function getPaypalAccount($pageId)
     {
-        return Settings::get('paypalEmail');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('paypalEmail');
+//        return Settings::get('paypalEmail');
     }
 
     /**
      * @return mixed
      */
-    public static function getTax()
+    public static function getTax($pageId)
     {
-        if (Settings::get('tax') == "") {
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+
+
+        if (Settings::where('useId',$userId)->value('tax') == "") {
             return "0";
         } else {
-            return Settings::get('tax');
+            return Settings::where('useId',$userId)->value('tax');
         }
 
     }
@@ -120,93 +113,104 @@ class Data extends Controller
     /**
      * @return mixed
      */
-    public static function getShippingCost()
+    public static function getShippingCost($pageId)
     {
-        if (Settings::get('shipping') == "") {
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        if (Settings::where('userId',$userId)->value('shipping') == "") {
             return "0";
         } else {
-            return Settings::get('shipping');
+            return Settings::where('userId',$userId)->value('shipping');
         }
     }
 
     /**
      * @return mixed
      */
-    public static function getEmail()
+    public static function getEmail($pageId)
     {
-        return Settings::get('email');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('email');
     }
 
     /**
      * @return mixed
      */
-    public static function getAfterOrderMsg()
+    public static function getAfterOrderMsg($pageId)
     {
-        return Settings::get('afterOrderMsg');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('afterOrderMsg');
     }
 
     /**
      * @return string
      */
-    public static function getLogo()
+    public static function getLogo($pageId)
     {
-        return url('/uploads') . "/" . Settings::get('logo');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return url('/uploads') . "/" . Settings::where('userId',$userId)->value('logo');
     }
 
     /**
      * @return mixed
      */
-    public static function getLogoData()
+    public static function getLogoData($pageId)
     {
-        return Settings::get('logo');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('logo');
     }
 
     /**
      * @return mixed
      */
-    public static function getShopTitle()
+    public static function getShopTitle($pageId)
     {
-        return Settings::get('title');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('title');
     }
 
     /**
      * @return mixed
      */
-    public static function getShopSubTitle()
+    public static function getShopSubTitle($pageId)
     {
-        return Settings::get('subTitle');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('subTitle');
     }
 
     /**
      * @return mixed
      */
-    public static function getShopAddress()
+    public static function getShopAddress($pageId)
     {
-        return Settings::get('address');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('address');
     }
 
     /**
      * @return mixed
      */
-    public static function getPhone()
+    public static function getPhone($pageId)
     {
-        return Settings::get('phone');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('phone');
     }
 
     /**
      * @return string
      */
-    public static function getMap()
+    public static function getMap($pageId)
     {
-        return "http://maps.googleapis.com/maps/api/staticmap?zoom=14&size=250x150&markers=icon:|" . Settings::get('map');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return "http://maps.googleapis.com/maps/api/staticmap?zoom=14&size=250x150&markers=icon:|" . Settings::where('userId',$userId)->value('map');
     }
 
     /**
      * @return mixed
      */
-    public static function getMapData()
+    public static function getMapData($pageId)
     {
-        return Settings::get('map');
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        return Settings::where('userId',$userId)->value('map');
     }
 
     /**
@@ -261,16 +265,16 @@ class Data extends Controller
 
     }
 
-    public static function convert($text)
-    {
-
-        $translate = new TranslateClient(null);
-
-        $translate->translate($text);
-        $lang = $translate->getLastDetectedSource();
-        return $lang;
-
-    }
+//    public static function convert($text)
+//    {
+//
+//        $translate = new TranslateClient(null);
+//
+//        $translate->translate($text);
+//        $lang = $translate->getLastDetectedSource();
+//        return $lang;
+//
+//    }
 
     public static function notify($content)
     {

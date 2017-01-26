@@ -26,7 +26,7 @@ class Category extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function viewCategoryIndex(){
-        $data = Catagories::all();
+        $data = Catagories::where('userId',Auth::user()->id)->get();
         return view('category',compact('data'));
     }
 
@@ -36,14 +36,14 @@ class Category extends Controller
      */
     public function addCategory(Request $re){
         $name = $re->name;
-        $wooCommerce = new WooController();
+        $wooCommerce = new WooController($re->pageId);
         $woo = $wooCommerce->woo;
         $data = [
             'name' => $name,
 
         ];
         try{
-            if(Catagories::where('userId',Auth::user()->id)->count() >= 10){
+            if(Catagories::where('userId',Auth::user()->id)->where('pageId',$re->pageId)->count() >= 10){
                 return "Sorry sir , you can't add more than 10 categories. All because facebook gui button don't allow more than 10 buttons . But in the next version we will make subcategory system fore more options . thanks for your patience";
             }
             try{
@@ -54,6 +54,7 @@ class Category extends Controller
             $cat = new Catagories();
             $cat->name = $name;
             $cat->userId = Auth::user()->id;
+            $cat->pageId = $re->pageId;
             $cat->save();
             return "success";
         }
@@ -92,5 +93,12 @@ class Category extends Controller
         catch (\Exception $e){
             return $e->getMessage();
         }
+    }
+
+    public function wooAddCategoryIndex()
+    {
+
+
+        return view('wooaddcategory');
     }
 }

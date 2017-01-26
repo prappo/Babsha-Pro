@@ -72,8 +72,7 @@
 
             <!-- Branding Image -->
             <a class="navbar-brand" href="<?php echo e(url('/')); ?>">
-                <?php echo e(\App\Http\Controllers\Data::getShopTitle()); ?>
-
+                <?php if(!Auth::guest()): ?><?php echo e(\App\Settings::where('userId',Auth::user()->id)->value('title')); ?><?php endif; ?>
             </a>
         </div>
 
@@ -138,7 +137,15 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
              <span
-                     class="badge"><?php echo e(\App\Http\Controllers\Data::getUnit()); ?> <?php echo e(\App\Income::where('userId',Auth::user()->id)->sum('money')); ?></span>
+                     class="badge">
+                 <?php if(!Auth::guest()): ?>
+
+                     <?php echo e(\App\Income::where('userId',Auth::user()->id)->sum('money')); ?>
+
+                     <?php echo e(\App\Settings::where('userId',Auth::user()->id)->value('currency')); ?>
+
+                 <?php endif; ?>
+             </span>
                                 <span class="caret"></span>
                                 </span>
                             </a>
@@ -167,7 +174,8 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
-                                Orders <span class="badge"><?php echo e(\App\Orders::where('userId',Auth::user()->id)->where('status','pending')->count()); ?></span>
+                                Orders <span
+                                        class="badge"><?php echo e(\App\Orders::where('userId',Auth::user()->id)->where('status','pending')->count()); ?></span>
                                 <span
                                         class="caret"></span>
                             </a>

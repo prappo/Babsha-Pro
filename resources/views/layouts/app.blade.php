@@ -72,7 +72,7 @@
 
             <!-- Branding Image -->
             <a class="navbar-brand" href="{{ url('/') }}">
-                {{\App\Http\Controllers\Data::getShopTitle()}}
+                @if (!Auth::guest()){{\App\Settings::where('userId',Auth::user()->id)->value('title')}}@endif
             </a>
         </div>
 
@@ -137,7 +137,13 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
              <span
-                     class="badge">{{\App\Http\Controllers\Data::getUnit()}} {{\App\Income::where('userId',Auth::user()->id)->sum('money')}}</span>
+                     class="badge">
+                 @if (!Auth::guest())
+
+                     {{\App\Income::where('userId',Auth::user()->id)->sum('money')}}
+                     {{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}
+                 @endif
+             </span>
                                 <span class="caret"></span>
                                 </span>
                             </a>
@@ -166,7 +172,8 @@
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                aria-expanded="false">
-                                Orders <span class="badge">{{\App\Orders::where('userId',Auth::user()->id)->where('status','pending')->count()}}</span>
+                                Orders <span
+                                        class="badge">{{\App\Orders::where('userId',Auth::user()->id)->where('status','pending')->count()}}</span>
                                 <span
                                         class="caret"></span>
                             </a>

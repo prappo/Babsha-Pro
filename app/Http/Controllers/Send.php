@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use App\Customers;
+use App\FacebookPages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 
@@ -36,7 +37,7 @@ class Send extends Controller
                 "id" => self::convertId($userId)
             ],
             "message" => [
-                "text" => Data::translate($message, Data::getUserLang($userId))
+                "text" => $message
             ]
         ];
         return json_encode($data);
@@ -483,12 +484,12 @@ class Send extends Controller
                             [
                                 "title" => $title,
                                 "image_url" => $image,
-                                "subtitle" => Data::translate($subTitle, Data::getUserLang($userId)),
+                                "subtitle" => $subTitle,
                                 "buttons" => [
 
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Remove", Data::getUserLang($userId)),
+                                        "title" => "Remove",
                                         "payload" => "cancelcart_" . $orderId
                                     ]
                                 ]
@@ -520,8 +521,9 @@ class Send extends Controller
      * @param $image
      * @return string
      */
-    public static function receipt($userId, $orderNumber, $userName, $title, $shortDescription, $price, $quanity, $total, $subtotal, $street, $city, $postalCode, $state, $country, $image, $paymentMethod)
+    public static function receipt($userId, $orderNumber, $userName, $title, $shortDescription, $price, $quanity, $total, $subtotal, $street, $city, $postalCode, $state, $country, $image, $paymentMethod,$pageId)
     {
+
         $data = [
             "recipient" => [
                 "id" => $userId
@@ -533,7 +535,7 @@ class Send extends Controller
                         "template_type" => "receipt",
                         "recipient_name" => $userName,
                         "order_number" => $orderNumber,
-                        "currency" => Data::getCurrency(),
+                        "currency" => Data::getCurrency($pageId),
                         "payment_method" => $paymentMethod,
                         "order_url" => "https://zubehor.heroku.com",
 //                        "timestamp" => "1428444852",
@@ -543,7 +545,7 @@ class Send extends Controller
                                 "subtitle" => $shortDescription,
                                 "quantity" => (int)$quanity,
                                 "price" => $price,
-                                "currency" => Data::getCurrency(),
+                                "currency" => Data::getCurrency($pageId),
                                 "image_url" => url('/uploads') . "/" . $image,
 
                             ]
@@ -558,8 +560,8 @@ class Send extends Controller
                         ],
                         "summary" => [
                             "subtotal" => $subtotal,
-                            "shipping_cost" => Data::getShippingCost(),
-                            "total_tax" => Data::getTax(),
+                            "shipping_cost" => Data::getShippingCost($pageId),
+                            "total_tax" => Data::getTax($pageId),
                             "total_cost" => $total
                         ]
                     ]
@@ -571,7 +573,7 @@ class Send extends Controller
         return json_encode($data);
     }
 
-    public static function receiptList($userId, $userName, $orderNumber, $items, $subtotal, $total, $paymentMethod)
+    public static function receiptList($userId, $userName, $orderNumber, $items, $subtotal, $total, $paymentMethod,$pageId)
     {
 
         $street = Customers::where('fbId', $userId)->value('street');
@@ -596,7 +598,7 @@ class Send extends Controller
         "template_type":"receipt",
         "recipient_name":"' . $userName . '",
         "order_number":"' . $orderNumber . '",
-        "currency":"' . Data::getCurrency() . '",
+        "currency":"' . Data::getCurrency($pageId) . '",
         "payment_method":"' . $paymentMethod . '",        
         "order_url":"' . url('/') . '/public/orders/' . $orderNumber . '", 
         "elements":' . json_encode($items) . ',
@@ -610,8 +612,8 @@ class Send extends Controller
         },
         "summary":{
           "subtotal":' . $subtotal . ',
-          "shipping_cost":' . Data::getShippingCost() . ',
-          "total_tax":' . Data::getTax() . ',
+          "shipping_cost":' . Data::getShippingCost($pageId) . ',
+          "total_tax":' . Data::getTax($pageId) . ',
           "total_cost":' . $total . '
         }
       }
@@ -748,19 +750,19 @@ class Send extends Controller
     {
         try {
             if ($request->message != "") {
-                $msg = Run::fire(self::sendMessage($request->sender, $request->message));
+                $msg = Run::fire(self::sendMessage($request->sender, $request->message),$request->pageId);
             }
 
             if ($request->image != "") {
-                $img = Run::fire(self::sendImage($request->sender, $request->image));
+                $img = Run::fire(self::sendImage($request->sender, $request->image),$request->pageId);
             }
 
             if ($request->audio != "") {
-                $audio = Run::fire(self::sendAudio($request->sender, $request->audio));
+                $audio = Run::fire(self::sendAudio($request->sender, $request->audio),$request->pageId);
             }
 
             if ($request->video != "") {
-                $video = Run::fire(self::sendVideo($request->sender, $request->video));
+                $video = Run::fire(self::sendVideo($request->sender, $request->video),$request->pageId);
             }
 
 
@@ -769,7 +771,7 @@ class Send extends Controller
         }
     }
 
-    public static function continueShoppin($sender)
+    public static function continueShoppin($sender,$pageId)
     {
         $buttons = [];
 
@@ -795,41 +797,41 @@ class Send extends Controller
 
         array_push($buttons, Send::elements(Data::translate("Continue shopping ?", Data::getUserLang($sender)) . "", "", "", [$btnYes, $btnCart, $btnCheckOut]));
         $jsonData = Send::item($sender, $buttons);
-        Run::fire($jsonData);
+        Run::fire($jsonData,$pageId);
     }
 
 
-    public static function askForOrder($sender)
+    public static function askForOrder($sender,$pageId)
     {
         $buttons = [];
 
         $btnYes = [
             "type" => "postback",
             "payload" => "paymentMethod",
-            "title" => Data::translate("Yes", Data::getUserLang($sender))
+            "title" => "Yes"
         ];
 
 
         $btnNo = [
             "type" => "postback",
             "payload" => "menu",
-            "title" => Data::translate("No", Data::getUserLang($sender))
+            "title" => "No"
         ];
 
         $btnShopping = [
             "type" => "postback",
             "payload" => "view_products",
-            "title" => Data::translate("Continue Shopping", Data::getUserLang($sender))
+            "title" => "Continue Shopping"
         ];
 
 
-        array_push($buttons, Send::elements(Data::translate("Do you want to place order ?", Data::getUserLang($sender)) . "", "", "", [$btnYes, $btnNo, $btnShopping]));
+        array_push($buttons, Send::elements("Do you want to place order ?" . "", "", "", [$btnYes, $btnNo, $btnShopping]));
 
         $jsonData = Send::item($sender, $buttons);
-        Run::fire($jsonData);
+        Run::fire($jsonData,$pageId);
     }
 
-    public static function paymentMethod($sender)
+    public static function paymentMethod($sender,$pageId)
     {
         $buttons = [];
 
@@ -856,10 +858,10 @@ class Send extends Controller
         array_push($buttons, Send::elements(Data::translate("Select a payment method", Data::getUserLang($sender)) . "", "", "", [$btnPyaPal, $btnCash, $btnShopping]));
 
         $jsonData = Send::item($sender, $buttons);
-        Run::fire($jsonData);
+        Run::fire($jsonData,$pageId);
     }
 
-    public static function checkout($sender)
+    public static function checkout($sender,$pageId)
     {
         $data = '{
   "recipient":{
@@ -886,10 +888,10 @@ class Send extends Controller
     }
   }
 }';
-        Run::fire($data);
+        Run::fire($data,$pageId);
     }
 
-    public static function placeOrderViaPaypal($userId)
+    public static function placeOrderViaPaypal($userId,$pageId)
     {
         $data = [
             "recipient" => [
@@ -913,7 +915,7 @@ class Send extends Controller
         ];
 
 
-        Run::fire(json_encode($data));
+        Run::fire(json_encode($data),$pageId);
 
     }
 

@@ -44,10 +44,10 @@ class Bot extends Controller
         }
     }
 
-    public static function check($msg){
+    public static function check($msg,$pageId){
         $result = 0;
         $data = "";
-        foreach (\App\Bot::all() as $bot){
+        foreach (\App\Bot::where('pageId',$pageId)->get() as $bot){
 
             similar_text($msg,$bot->message,$result);
             if($result >= 65) {

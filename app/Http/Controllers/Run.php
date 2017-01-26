@@ -6,6 +6,7 @@ use App\Cart;
 use App\Catagories;
 use App\Customers;
 //use App\Orders;
+use App\FacebookPages;
 use App\Products;
 use Stichoza\GoogleTranslate\TranslateClient;
 
@@ -41,7 +42,7 @@ class Run extends Controller
 
         if ($linking != "nothing") {
             if ($input['entry'][0]['messaging'][0]['account_linking']['authorization_code'] == "1337") {
-                self::fire(Send::sendText($sender, "Thank you for updating your information"),$pageId);
+                self::fire(Send::sendText($sender, "Thank you for updating your information"), $pageId);
             } elseif ($input['entry'][0]['messaging'][0]['account_linking']['authorization_code'] == "7331") {
 //                self::fire(Send::sendText($sender, "Payment successfully received"));
             }
@@ -53,69 +54,70 @@ class Run extends Controller
         $lang = 'en';
         $translatedText = $message;
         /* blocking bot for user */
-        if (Customers::where('fbId', $sender)->exists()) {
-            $botStatus = Customers::where('fbId', $sender)->value('bot');
+        if (Customers::where('fbId', $sender)->where('pageId', $pageId)->exists()) {
+            $botStatus = Customers::where('fbId', $sender)->where('pageId', $pageId)->value('bot');
             if ($botStatus == 'no') {
                 exit;
             }
         }
 
-        if ($location != "nothing") {
-            $lat = $input['entry'][0]['messaging'][0]['message']['attachments'][0]['payload']['coordinates']['lat'];
-            $long = $input['entry'][0]['messaging'][0]['message']['attachments'][0]['payload']['coordinates']['long'];
-            $coordinates = $lat . "," . $long;
-            $mapJson = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=" . $coordinates);
-            $data = json_decode($mapJson);
-            $address = $data->results[0]->address_components[0]->long_name . ", " . $data->results[0]->address_components[1]->long_name . ", " . $data->results[0]->address_components[2]->long_name . ", " . $data->results[0]->address_components[3]->long_name . ", " . $data->results[0]->address_components[4]->long_name . ", " . $data->results[0]->address_components[5]->long_name . ", " . $data->results[0]->address_components[6]->long_name;
-            try {
-                Customers::where('fbId', $sender)->update([
-                    'coordinates' => $coordinates,
-                    'address' => $address
-                ]);
-                self::fire(Send::sendText($sender, "Thank you for updating shipping address"),$pageId);
-                exit;
-            } catch (\Exception $e) {
-                self::fire(Send::sendText($sender, "Something went wrong . We couldn't store your location"),$pageId);
-                exit;
-            }
-
-
-        }
+//        if ($location != "nothing") {
+//            $lat = $input['entry'][0]['messaging'][0]['message']['attachments'][0]['payload']['coordinates']['lat'];
+//            $long = $input['entry'][0]['messaging'][0]['message']['attachments'][0]['payload']['coordinates']['long'];
+//            $coordinates = $lat . "," . $long;
+//            $mapJson = file_get_contents("http://maps.googleapis.com/maps/api/geocode/json?latlng=" . $coordinates);
+//            $data = json_decode($mapJson);
+//            $address = $data->results[0]->address_components[0]->long_name . ", " . $data->results[0]->address_components[1]->long_name . ", " . $data->results[0]->address_components[2]->long_name . ", " . $data->results[0]->address_components[3]->long_name . ", " . $data->results[0]->address_components[4]->long_name . ", " . $data->results[0]->address_components[5]->long_name . ", " . $data->results[0]->address_components[6]->long_name;
+//            try {
+//                Customers::where('fbId', $sender)->update([
+//                    'coordinates' => $coordinates,
+//                    'address' => $address
+//                ]);
+//                self::fire(Send::sendText($sender, "Thank you for updating shipping address"),$pageId);
+//                exit;
+//            } catch (\Exception $e) {
+//                self::fire(Send::sendText($sender, "Something went wrong . We couldn't store your location"),$pageId);
+//                exit;
+//            }
+//
+//
+//        }
 
         /*
          * Checking user if already exist
          * */
-        try {
-            if (Customers::where('fbId', $sender)->exists()) {
+        echo "get incoming connection\n";
 
-                $botStatus = Customers::where('fbId', $sender)->value('bot');
-                if ($botStatus == 'no') {
-                    exit;
-                }
-                $customer = new Customers();
-                $msg = Data::translate("Welcome back ", $sender) . $customer->name . "\n" . Data::translate(" Check out our menu . If you need more help please type help and send us", $sender);
+        try {
+            if (Customers::where('fbId', $sender)->where('pageId', $pageId)->exists()) {
 
             } else {
-                $user = Receive::getProfile($sender, Data::getToken($pageId));
-                $customer = new Customers();
-                $customer->fbId = $sender;
-                $customer->name = $user->first_name . " " . $user->last_name;
-                $customer->image = $user->profile_pic;
-                $customer->street = "none";
-                $customer->city = "none";
-                $customer->country = "none";
-                $customer->postal_code = "none";
-                $customer->state = "none";
-                $customer->mobile = "none";
-                $customer->lang = $lang;
-                $customer->save();
-                $msg = "Hello " . $user->first_name . "\nCheck out our menu . If you need more help please type 'help'";
+                try {
+                    $user = Receive::getProfile($sender, Data::getToken($pageId));
+                    $customer = new Customers();
+                    $customer->fbId = $sender;
+                    $customer->name = $user->first_name . " " . $user->last_name;
+                    $customer->image = $user->profile_pic;
+                    $customer->street = "none";
+                    $customer->city = "none";
+                    $customer->country = "none";
+                    $customer->postal_code = "none";
+                    $customer->state = "none";
+                    $customer->mobile = "none";
+                    $customer->lang = $lang;
+                    $customer->pageId = $pageId;
+                    $customer->save();
+                } catch (\Exception $exception) {
+
+                }
+
+
             }
         } catch (\Exception $e) {
+            echo $e->getMessage() . "\n";
         }
 
-        $arr = ["hi", "Hi", "hello", "Hello"];
-        $optArr = ['menu', 'products', 'contact', 'email', 'my account'];
+
         if (!empty($input['entry'][0]['messaging'][0]['message'])) {
 
             if ($message != "nothing") {
@@ -126,79 +128,50 @@ class Run extends Controller
                  *
                  * */
 
-                if (in_array($message, $arr)) {
+                if (Bot::checkPer($message) >= 65) {
 
-
-                    self::fire(Send::sendMessage($sender, $msg),$pageId);
-                } elseif (Bot::checkPer($message) >= 65) {
-                    self::fire(Send::sendMessage($sender, Bot::check($message)),$pageId);
+                    self::fire(Send::sendMessage($sender, Bot::check($message, $pageId)), $pageId);
                     exit;
-                } elseif (in_array($translatedText, $arr)) {
-                    $user = Receive::getProfile($sender, Data::getToken($pageId));
-                    if (Customers::where('fbId', $sender)->exists()) {
-                        $botStatus = Customers::where('fbId', $sender)->value('bot');
-                        if ($botStatus == 'no') {
-                            exit;
-                        }
-                        $msg = "Welcome back " . $user->first_name . "\n" . " Check out our menu . If you need more help please type help and send us";
 
-                    } else {
-                        $customer = new Customers();
-                        $customer->fbId = $sender;
-                        $customer->name = $user->first_name . " " . $user->last_name;
-                        $customer->image = $user->profile_pic;
-                        $customer->street = "none";
-                        $customer->city = "none";
-                        $customer->country = "none";
-                        $customer->postal_code = "none";
-                        $customer->state = "none";
-                        $customer->mobile = "none";
-                        $customer->lang = $lang;
-                        $customer->pageId = $pageId;
-                        $customer->save();
-                        $msg = "Hello " . $user->first_name . "\nCheck out our menu . If you need more help please type 'help'";
-                    }
-
-                    self::fire(Send::sendText($sender, $msg),$pageId);
                 } elseif (Data::similar(strtolower($message), "help") >= 70) {
-                    self::fire(Send::sendText($sender, Send::helpText()),$pageId);
+                    self::fire(Send::sendText($sender, Send::helpText()), $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "my cart") >= 70) {
-                    self::myCart($sender);
+                    self::myCart($sender, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "my orders") >= 70) {
-                    self::myOrders($sender);
+                    self::myOrders($sender, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "ordered item list") >= 70) {
-                    self::myOrdersItem($sender);
+                    self::myOrdersItem($sender, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "menu") >= 70) {
-                    self::fire(self::getMenu($sender, $lang),$pageId);
+                    self::fire(self::getMenu($sender, $pageId), $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "contact") >= 70) {
-                    self::fire(self::contactOptions($sender),$pageId);
+                    self::fire(self::contactOptions($sender, $pageId), $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "account") >= 70) {
-                    self::fire(self::showProfile($sender,$pageId),$pageId);
+                    self::fire(self::showProfile($sender, $pageId), $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "products") >= 70) {
-                    self::fire(Send::sendText($sender, "Select a category"),$pageId);
-                    $json = self::getCategories($sender);
-                    self::fire($json,$pageId);
+                    self::fire(Send::sendText($sender, "Select a category"), $pageId);
+                    $json = self::getCategories($sender, $pageId);
+                    self::fire($json, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "featured products") >= 70) {
-                    self::showFeaturedProducts($sender);
+                    self::showFeaturedProducts($sender, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "more options") >= 70) {
-                    $jsonData = self::moreOptions($sender);
-                    self::fire($jsonData,$pageId);
+                    $jsonData = self::moreOptions($sender, $pageId);
+                    self::fire($jsonData, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "checkout") >= 70) {
-                    Send::paymentMethod($sender);
+                    Send::paymentMethod($sender, $pageId);
                     exit;
                 } elseif (Data::similar(strtolower($message), "email") >= 70) {
-                    $jsonData = Send::sendMessage($sender, Data::getEmail());
-                    self::fire($jsonData,$pageId);
+                    $jsonData = Send::sendMessage($sender, Data::getEmail($pageId));
+                    self::fire($jsonData, $pageId);
                     exit;
                 } else {
                     if ($catPostBack == "nothing") {
@@ -213,7 +186,8 @@ class Run extends Controller
 
                         $msgArr = ["Oops, I didn't catch that. For things I can help you with, type 'help' or check out our menu.", "I’m sorry; I’m not sure I understand. Try typing 'help' or check out our menu"];
                         $index = array_rand($msgArr);
-                        self::fire(Send::sendText($sender, Data::translate($msgArr[$index], $lang)),$pageId);
+                        self::fire(Send::sendText($sender,$msgArr[$index]), $pageId);
+                        exit;
 
 
                     }
@@ -227,37 +201,41 @@ class Run extends Controller
         if ($catPostBack == "nothing") {
 
             if ($postback == "nothing") {
-                $jsonData = self::getMenu($sender, $lang);
+                $jsonData = self::getMenu($sender, $pageId);
+//                self::fire($jsonData,$pageId);
+//                exit;
             } else {
                 if ($postback == "contact_us") {
 
-                    $jsonData = self::contactOptions($sender);
-                    self::fire($jsonData,$pageId);
+                    $jsonData = self::contactOptions($sender, $pageId);
+                    self::fire($jsonData, $pageId);
                     exit;
                 } elseif ($postback == "menu") {
-                    $jsonData = self::getMenu($sender, $lang);
+                    $jsonData = self::getMenu($sender, $pageId);
+                    self::fire($jsonData, $pageId);
                 } elseif ($postback == "me") {
-                    $jsonData = self::showProfile($sender,$pageId);
+                    $jsonData = self::showProfile($sender, $pageId);
+                    self::fire($jsonData, $pageId);
                 } elseif ($postback == "view_products") {
-                    self::fire(Send::sendText($sender, "Please select a category"),$pageId);
-                    $jsonData = self::getCategories($sender);
-                    self::fire($jsonData,$pageId);
+                    self::fire(Send::sendText($sender, "Please select a category"), $pageId);
+                    $jsonData = self::getCategories($sender, $pageId);
+                    self::fire($jsonData, $pageId);
                     exit;
                 } elseif ($postback == "help") {
-                    self::fire(Send::sendText($sender, Send::helpText()),$pageId);
+                    self::fire(Send::sendText($sender, Send::helpText()), $pageId);
                     exit;
                 } elseif ($postback == "more_options") {
 
-                    $jsonData = self::moreOptions($sender);
-                    self::fire($jsonData,$pageId);
+                    $jsonData = self::moreOptions($sender, $pageId);
+                    self::fire($jsonData, $pageId);
                     exit;
 
                 } elseif ($postback == "mail_us") {
-                    $jsonData = Send::sendText($sender, Data::getEmail());
-                    self::fire($jsonData,$pageId);
+                    $jsonData = Send::sendText($sender, Data::getEmail($pageId));
+                    self::fire($jsonData, $pageId);
                     exit;
                 } elseif ($postback == "subscribe") {
-                    self::fire(Send::sendText($sender, Customer::subscribe($sender)),$pageId);
+                    self::fire(Send::sendText($sender, Customer::subscribe($sender,$pageId)), $pageId);
                     exit;
                 } elseif ($postback == "user_orders") {
 //                    $myOrders = \App\Orders::where('sender', $sender)->where('status', 'pending')->get();
@@ -273,26 +251,26 @@ class Run extends Controller
 //                    }
 //                    self::fire(Send::sendText($sender, "Total Orders : " . $count));
 //                    self::fire(Send::sendText($sender, "Total Cost : " . Data::getUnit() . $price));
-                    if(\App\Orders::where('status','pending')->where('sender',$sender)->count() == 0){
-                        self::fire(Send::sendText($sender,"You don't have any order"),$pageId);
+                    if (\App\Orders::where('status', 'pending')->where('sender', $sender)->count() == 0) {
+                        self::fire(Send::sendText($sender, "You don't have any order"), $pageId);
                         exit;
                     }
                     $orders = \App\Orders::distinct()->where('status', 'pending')->where('sender', $sender)->get(['orderId', 'created_at', 'sender']);
                     foreach ($orders as $order) {
-                        self::fire(Send::showSingleOrderList($sender, "Order No #" . $order->orderId, $order->orderId),$pageId);
+                        self::fire(Send::showSingleOrderList($sender, "Order No #" . $order->orderId, $order->orderId), $pageId);
                     }
                     exit;
 
                 } elseif ($postback == "my_cart") {
-                    self::myCart($sender);
+                    self::myCart($sender, $pageId);
 
                 } elseif ($postback == "checkout") {
-                    Send::paymentMethod($sender);
+                    Send::paymentMethod($sender, $pageId);
 
                 } elseif ($postback == "paypal") {
-                    Send::placeOrderViaPaypal($sender);
+                    Send::placeOrderViaPaypal($sender, $pageId);
                 } elseif ($postback == "paymentMethod") {
-                    self::fire(Send::paymentMethod($sender),$pageId);
+                    self::fire(Send::paymentMethod($sender, $pageId), $pageId);
                 } elseif ($postback == "order") {
                     /*
                       * make  order
@@ -315,17 +293,17 @@ class Run extends Controller
                     try {
                         Cart::where('sender', $sender)->delete();
                     } catch (\Exception $e) {
-                        self::fire(Send::sendText($sender, "Something went wrong we couldn't remove products form cart"),$pageId);
+                        self::fire(Send::sendText($sender, "Something went wrong we couldn't remove products form cart"), $pageId);
                     }
-                    self::fire(Send::sendText($sender, Data::getAfterOrderMsg()),$pageId);
-                    self::fire(Send::sendText($sender, "Your Order ID #" . $orderID),$pageId);
-                    self::fire(Send::updateInfo($sender),$pageId);
+                    self::fire(Send::sendText($sender, Data::getAfterOrderMsg($pageId)), $pageId);
+                    self::fire(Send::sendText($sender, "Your Order ID #" . $orderID), $pageId);
+                    self::fire(Send::updateInfo($sender), $pageId);
 
                     Data::notify(Customers::where('fbId', $sender)->value('name') . " Placed and order with Cash on Delivery Method");
 
                 } elseif ($postback == "featured") {
 //                    show featured products
-                    self::showFeaturedProducts($sender);
+                    self::showFeaturedProducts($sender, $pageId);
 
                     exit;
                 } else {
@@ -344,12 +322,12 @@ class Run extends Controller
                         $type = $data[3];
                         if ($type != "woo") {
                             if (!Products::where('id', $productId)->exists()) {
-                                self::fire(Send::sendText($sender, "Product don't exists"),$pageId);
+                                self::fire(Send::sendText($sender, "Product don't exists"), $pageId);
                                 exit;
                             }
                         }
                         if ($type == "woo") {
-                            $wooProduct = new WooProduct($productId);
+                            $wooProduct = new WooProduct($productId,$pageId);
                             $cart = new Cart();
                             $cart->orderId = $orderId;
                             $cart->sender = $sender;
@@ -357,6 +335,8 @@ class Run extends Controller
                             $cart->status = "pending";
                             $cart->price = $wooProduct->price;
                             $cart->type = $type;
+                            $cart->userId = FacebookPages::where('pageId',$pageId)->value('userId');
+                            $cart->pageId = $pageId;
                             $cart->save();
                         } else {
                             $productPrice = Products::where('id', $productId)->value('price');
@@ -367,13 +347,15 @@ class Run extends Controller
                             $cart->status = "pending";
                             $cart->price = $productPrice;
                             $cart->type = $type;
+                            $cart->userId = FacebookPages::where('pageId',$pageId)->value('userId');
+                            $cart->pageId = $pageId;
                             $cart->save();
                         }
 
-                        self::fire(Send::sendText($sender, "Added to cart"),$pageId);
-                        self::fire(Send::sendText($sender, "You can check your cart by typing 'my cart'"),$pageId);
-                        self::fire(Send::sendText($sender, "For check out type 'checkout'"),$pageId);
-                        Send::continueShoppin($sender);
+                        self::fire(Send::sendText($sender, "Added to cart"), $pageId);
+                        self::fire(Send::sendText($sender, "You can check your cart by typing 'my cart'"), $pageId);
+                        self::fire(Send::sendText($sender, "For check out type 'checkout'"), $pageId);
+                        Send::continueShoppin($sender, $pageId);
                         exit;
 
                     } elseif ($prefex == "order") {
@@ -381,7 +363,7 @@ class Run extends Controller
 
                     } elseif ($prefex == "share") {
                         $sharedProduct = Products::where('id', $postfex)->where('status', 'published')->first();
-                        self::fire(Send::shareSingleItem($sender, $sharedProduct->title, $sharedProduct->short_description, $sharedProduct->image),$pageId);
+                        self::fire(Send::shareSingleItem($sender, $sharedProduct->title, $sharedProduct->short_description, $sharedProduct->image), $pageId);
                         exit;
                     } elseif ($prefex == "details") {
                         /**
@@ -394,39 +376,39 @@ class Run extends Controller
                             $d = Products::where('id', $postfex)
                                 ->where('status', 'published')
                                 ->first();
-                            self::fire(Send::sendImage($sender, url('/uploads') . "/" . $d->image),$pageId);
+                            self::fire(Send::sendImage($sender, url('/uploads') . "/" . $d->image), $pageId);
 
-                            self::fire(Send::sendText($sender, $d->title),$pageId);
-                            self::fire(Send::sendText($sender, Data::getUnit() . $d->price),$pageId);
-                            self::fire(Send::sendText($sender, $d->short_description),$pageId);
-                            self::fire(Send::sendText($sender, $d->long_description),$pageId);
+                            self::fire(Send::sendText($sender, $d->title), $pageId);
+                            self::fire(Send::sendText($sender, Data::getUnit($pageId) . $d->price), $pageId);
+                            self::fire(Send::sendText($sender, $d->short_description), $pageId);
+                            self::fire(Send::sendText($sender, $d->long_description), $pageId);
                             $products = [];
 
                             $btnOrder = [
                                 "type" => "postback",
                                 "payload" => "cart_" . $sender . "_" . $d->id . "_" . "babsha",
-                                "title" => Data::translate("Add to cart", Data::getUserLang($sender))
+                                "title" => "Add to cart"
                             ];
 
 
                             $btnBack = [
                                 "type" => "postback",
                                 "payload" => "view_products",
-                                "title" => Data::translate("Continue Shopping", Data::getUserLang($sender))
+                                "title" => "Continue Shopping"
                             ];
                             $cartCount = Cart::where('sender', $sender)->count();
 
                             $btnBuy = [
                                 "type" => "postback",
                                 "payload" => "my_cart",
-                                "title" => Data::translate("My Cart " . "(" . $cartCount . ")", Data::getUserLang($sender))
+                                "title" => "My Cart " . "(" . $cartCount . ")"
                             ];
 
-                            array_push($products, Send::elements(Data::translate("Select an option", Data::getUserLang($sender)) . "", "", "", [$btnOrder, $btnBuy, $btnBack]));
+                            array_push($products, Send::elements("Select an option" . "", "", "", [$btnOrder, $btnBuy, $btnBack]));
 
                             $jsonData = Send::item($sender, $products);
-                            self::fire($jsonData,$pageId);
-                            self::fire(Send::buttonSingle($sender, $d->id),$pageId);
+                            self::fire($jsonData, $pageId);
+                            self::fire(Send::buttonSingle($sender, $d->id), $pageId);
 
                             exit;
                         } catch (\Exception $e) {
@@ -437,15 +419,15 @@ class Run extends Controller
                              */
 
                             $products = [];
-                            $woo = new WooController();
+                            $woo = new WooController($pageId);
                             $product = $woo->getProductById($postfex);
 
-                            self::fire(Send::sendImage($sender, $product['images'][0]['src']),$pageId);
+                            self::fire(Send::sendImage($sender, $product['images'][0]['src']), $pageId);
 
 
-                            self::fire(Send::sendText($sender, $product['name']),$pageId);
-                            self::fire(Send::sendText($sender, Data::getUnit() . $product['price']),$pageId);
-                            self::fire(Send::sendText($sender, strip_tags($product['description'])),$pageId);
+                            self::fire(Send::sendText($sender, $product['name']), $pageId);
+                            self::fire(Send::sendText($sender, Data::getUnit($pageId) . $product['price']), $pageId);
+                            self::fire(Send::sendText($sender, strip_tags($product['description'])), $pageId);
 
                             /*
                              * request to client for place an order
@@ -454,19 +436,19 @@ class Run extends Controller
                             $btnOrder = [
                                 "type" => "postback",
                                 "payload" => "cart_" . $sender . "_" . $product['id'] . "_" . "woo",
-                                "title" => Data::translate("Yes", Data::getUserLang($sender))
+                                "title" => "Yes"
                             ];
 
 
                             $btnBack = [
                                 "type" => "postback",
                                 "payload" => "view_products",
-                                "title" => Data::translate("No thanks", Data::getUserLang($sender))
+                                "title" => "No thanks"
                             ];
-                            array_push($products, Send::elements(Data::translate("Do you want to add to cart ?", Data::getUserLang($sender)) . "", "", "", [$btnOrder, $btnBack]));
+                            array_push($products, Send::elements("Do you want to add to cart ?" . "", "", "", [$btnOrder, $btnBack]));
 
                             $jsonData = Send::item($sender, $products);
-                            self::fire($jsonData,$pageId);
+                            self::fire($jsonData, $pageId);
                             exit;
 
                         }
@@ -478,9 +460,9 @@ class Run extends Controller
 
                         try {
                             \App\Orders::where('id', $postfex)->delete();
-                            self::fire(Send::sendText($sender, "Removed order"),$pageId);
+                            self::fire(Send::sendText($sender, "Removed order"), $pageId);
                         } catch (\Exception $e) {
-                            self::fire(Send::sendText($sender, "Something went wrong , for this moment we can't cancel your order please try again later"),$pageId);
+                            self::fire(Send::sendText($sender, "Something went wrong , for this moment we can't cancel your order please try again later"), $pageId);
                         }
                     } elseif ($prefex == "cancelcart") {
                         /*
@@ -490,10 +472,10 @@ class Run extends Controller
 
                         try {
                             Cart::where('id', $postfex)->delete();
-                            self::fire(Send::sendText($sender, "Removed from cart"),$pageId);
-                            Send::continueShoppin($sender);
+                            self::fire(Send::sendText($sender, "Removed from cart"), $pageId);
+                            Send::continueShoppin($sender, $pageId);
                         } catch (\Exception $e) {
-                            self::fire(Send::sendText($sender, "Something went wrong , for this moment we can't cancel your order please try again later"),$pageId);
+                            self::fire(Send::sendText($sender, "Something went wrong , for this moment we can't cancel your order please try again later"), $pageId);
                         }
                     }
                 }
@@ -511,7 +493,7 @@ class Run extends Controller
                  *
                  * */
                 try {
-                    $wooCommerce = new WooController();
+                    $wooCommerce = new WooController($pageId);
                     if ($wooCommerce->catExists($value)) {
                         if ($wooCommerce->getProducts($value) != "none") {
                             $products = [];
@@ -521,31 +503,31 @@ class Run extends Controller
                                     $btnOrder = [
                                         "type" => "postback",
                                         "payload" => "cart_" . $sender . "_" . $pro['id'] . "_" . "woo",
-                                        "title" => Data::translate("Add to cart", Data::getUserLang($sender))
+                                        "title" => "Add to cart"
                                     ];
                                     $btnDetails = [
                                         "type" => "postback",
                                         "payload" => "details_" . $pro['id'],
-                                        "title" => Data::translate("Product Details", Data::getUserLang($sender))
+                                        "title" => "Product Details"
                                     ];
 
                                     $btnBack = [
                                         "type" => "postback",
                                         "payload" => "view_products",
-                                        "title" => Data::translate("Back", Data::getUserLang($sender))
+                                        "title" => "Back"
                                     ];
-                                    array_push($products, Send::elements($pro['name'] . " (" . Data::getUnit() . $pro['price'] . ")", Data::translate(strip_tags($pro['short_description']), Data::getUserLang($sender)), $pro['images'][0]['src'], [$btnOrder, $btnDetails, $btnBack]));
+                                    array_push($products, Send::elements($pro['name'] . " (" . Data::getUnit($pageId) . $pro['price'] . ")", strip_tags($pro['short_description']), $pro['images'][0]['src'], [$btnOrder, $btnDetails, $btnBack]));
                                 }
                                 $jsonData = Send::item($sender, $products);
-                                self::fire($jsonData,$pageId);
+                                self::fire($jsonData, $pageId);
                             }
 
                             exit;
 
 
                         } else {
-                            self::fire(Send::sendText($sender, Data::translate("Sorry ! Products could not found \nPlease select another category", Data::getUserLang($sender))),$pageId);
-                            self::fire(self::getCategories($sender),$pageId);
+                            self::fire(Send::sendText($sender, "Sorry ! Products could not found \nPlease select another category"), $pageId);
+                            self::fire(self::getCategories($sender, $pageId), $pageId);
                             exit;
 
                         }
@@ -559,8 +541,8 @@ class Run extends Controller
                         ->where('status', 'published')
                         ->count() == 0
                 ) {
-                    self::fire(Send::sendText($sender, Data::translate("Sorry ! Products could not found \nPlease select another category", Data::getUserLang($sender))),$pageId);
-                    self::fire(self::getCategories($sender),$pageId);
+                    self::fire(Send::sendText($sender, "Sorry ! Products could not found \nPlease select another category"), $pageId);
+                    self::fire(self::getCategories($sender, $pageId), $pageId);
                     exit;
                 } else {
                     $d = Products::where('category', $value)
@@ -573,23 +555,23 @@ class Run extends Controller
                             $btnOrder = [
                                 "type" => "postback",
                                 "payload" => "cart_" . $sender . "_" . $pro->id . "_" . "babsha",
-                                "title" => Data::translate("Add to cart", Data::getUserLang($sender))
+                                "title" => "Add to cart"
                             ];
                             $btnDetails = [
                                 "type" => "postback",
                                 "payload" => "details_" . $pro->id,
-                                "title" => Data::translate("Product Details", Data::getUserLang($sender))
+                                "title" => "Product Details"
                             ];
 
                             $btnBack = [
                                 "type" => "postback",
                                 "payload" => "view_products",
-                                "title" => Data::translate("Back", Data::getUserLang($sender))
+                                "title" => "Back"
                             ];
-                            array_push($products, Send::elements($pro->title . " (" . Data::getUnit() . $pro->price . ")", Data::translate($pro->short_description, Data::getUserLang($sender)), url('/uploads') . "/" . $pro->image, [$btnOrder, $btnDetails, $btnBack]));
+                            array_push($products, Send::elements($pro->title . " (" . Data::getUnit($pageId) . $pro->price . ")", $pro->short_description, url('/uploads') . "/" . $pro->image, [$btnOrder, $btnDetails, $btnBack]));
                         }
                         $jsonData = Send::item($sender, $products);
-                        self::fire($jsonData,$pageId);
+                        self::fire($jsonData, $pageId);
                         $products = [];
 
                     }
@@ -617,15 +599,15 @@ class Run extends Controller
      * @param $sender
      * @return string
      */
-    public static function getCategories($sender)
+    public static function getCategories($sender, $pageId)
     {
         $menu = [];
-        $wooCommerce = new WooController();
+        $wooCommerce = new WooController($pageId);
         $woo = $wooCommerce->woo;
 
-        $data = Catagories::all();
+        $data = Catagories::where('pageId', $pageId)->get();
         foreach ($data as $d) {
-            array_push($menu, Send::quickBtn($d->name, "cat_" . $d->name));
+            array_push($menu, Send::quickBtn($d->name, "cat_" . $d->id));
         }
         try {
             $categories = $woo->get('products/categories');
@@ -636,7 +618,7 @@ class Run extends Controller
         }
 
 
-        return Send::button($sender, Data::translate("Categories", Data::getUserLang($sender)), $menu);
+        return Send::button($sender, "Categories", $menu);
 
     }
 
@@ -644,7 +626,7 @@ class Run extends Controller
      * @param $sender
      * @return string
      */
-    public static function getMenu($sender, $lang)
+    public static function getMenu($sender, $pageId)
     {
         $data = [
             "recipient" => [
@@ -657,23 +639,23 @@ class Run extends Controller
                         "template_type" => "generic",
                         "elements" => [
                             [
-                                "title" => Data::getShopTitle(),
-                                "image_url" => Data::getLogo(),
-                                "subtitle" => Data::translate(Data::getShopSubTitle(), $lang),
+                                "title" => Data::getShopTitle($pageId),
+                                "image_url" => Data::getLogo($pageId),
+                                "subtitle" => Data::getShopSubTitle($pageId),
                                 "buttons" => [
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Our products", $lang),
+                                        "title" => "Our products",
                                         "payload" => "view_products"
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("More Options", $lang),
+                                        "title" => "More Options",
                                         "payload" => "more_options"
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Contact us", $lang),
+                                        "title" => "Contact us",
                                         "payload" => "contact_us"
                                     ]
 
@@ -694,7 +676,7 @@ class Run extends Controller
      * @param $sender
      * @return string
      */
-    public static function moreOptions($sender)
+    public static function moreOptions($sender, $pageId)
     {
         $data = [
             "recipient" => [
@@ -707,23 +689,23 @@ class Run extends Controller
                         "template_type" => "generic",
                         "elements" => [
                             [
-                                "title" => Data::getShopTitle(),
-                                "image_url" => Data::getLogo(),
-                                "subtitle" => Data::getShopSubTitle(),
+                                "title" => Data::getShopTitle($pageId),
+                                "image_url" => Data::getLogo($pageId),
+                                "subtitle" => Data::getShopSubTitle($pageId),
                                 "buttons" => [
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("My account", Data::getUserLang($sender)),
+                                        "title" => "My account",
                                         "payload" => "me"
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Featured Items", Data::getUserLang($sender)),
+                                        "title" => "Featured Items",
                                         "payload" => "featured"
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Back", Data::getUserLang($sender)),
+                                        "title" => "Back",
                                         "payload" => "menu"
                                     ]
                                 ]
@@ -743,7 +725,7 @@ class Run extends Controller
      * @param $sender
      * @return string
      */
-    public static function contactOptions($sender)
+    public static function contactOptions($sender, $pageId)
     {
         $data = [
             "recipient" => [
@@ -756,23 +738,23 @@ class Run extends Controller
                         "template_type" => "generic",
                         "elements" => [
                             [
-                                "title" => Data::getShopTitle(),
-                                "image_url" => Data::getMap(),
-                                "subtitle" => Data::translate(Data::getShopSubTitle(), Data::getUserLang($sender)),
+                                "title" => Data::getShopTitle($pageId),
+                                "image_url" => Data::getMap($pageId),
+                                "subtitle" => Data::getShopSubTitle($pageId),
                                 "buttons" => [
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Email", Data::getUserLang($sender)),
+                                        "title" => "Email",
                                         "payload" => "mail_us"
                                     ],
                                     [
                                         "type" => "phone_number",
-                                        "title" => Data::translate("Call us", Data::getUserLang($sender)),
-                                        "payload" => Data::getPhone()
+                                        "title" => "Call us",
+                                        "payload" => Data::getPhone($pageId)
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Back", Data::getUserLang($sender)),
+                                        "title" => "Back",
                                         "payload" => "menu"
                                     ]
                                 ]
@@ -792,7 +774,7 @@ class Run extends Controller
     /**
      * @param $jsonData
      */
-    public static function fire($jsonData,$pageId)
+    public static function fire($jsonData, $pageId)
     {
         $url = 'https://graph.facebook.com/v2.6/me/messages?access_token=' . Data::getToken($pageId);
         $ch = curl_init($url);
@@ -809,7 +791,7 @@ class Run extends Controller
      * @param $sender
      * @return string
      */
-    public static function showProfile($sender,$pageId)
+    public static function showProfile($sender, $pageId)
     {
         $user = Receive::getProfile($sender, Data::getToken($pageId));
         $pic = $user->profile_pic;
@@ -834,17 +816,17 @@ class Run extends Controller
                                 "buttons" => [
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("My Orders " . "(" . $orderCount . ")", Data::getUserLang($sender)),
+                                        "title" => "My Orders " . "(" . $orderCount . ")",
                                         "payload" => "user_orders"
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("My Cart " . "(" . $cartCount . ")", Data::getUserLang($sender)),
+                                        "title" => "My Cart " . "(" . $cartCount . ")",
                                         "payload" => "my_cart"
                                     ],
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Subscribe / Unsubscribe", Data::getUserLang($sender)),
+                                        "title" => "Subscribe / Unsubscribe",
                                         "payload" => "subscribe"
                                     ]
 
@@ -862,7 +844,7 @@ class Run extends Controller
     /**
      * @param $sender
      */
-    public static function myOrdersItem($sender)
+    public static function myOrdersItem($sender, $pageId)
     {
         $myOrders = \App\Orders::where('sender', $sender)
             ->where('status', 'pending')
@@ -876,23 +858,23 @@ class Run extends Controller
 
                 $count++;
                 $price += $por->price;
-                self::fire(Send::showSingleOrder($sender, $por->title, $por->short_description . "\nPrice :" . Data::getUnit() . $por->price . "\n", url('/uploads') . "/" . $por->image, $order->id));
+                self::fire(Send::showSingleOrder($sender, $por->title, $por->short_description . "\nPrice :" . Data::getUnit($pageId) . $por->price . "\n", url('/uploads') . "/" . $por->image, $order->id), $pageId);
             }
         }
-        self::fire(Send::sendText($sender, "Total Orders : " . $count));
-        self::fire(Send::sendText($sender, "Total Cost : " . Data::getUnit() . $price));
+        self::fire(Send::sendText($sender, "Total Orders : " . $count), $pageId);
+        self::fire(Send::sendText($sender, "Total Cost : " . Data::getUnit($pageId) . $price), $pageId);
     }
 
-    public static function myOrders($sender)
+    public static function myOrders($sender, $pagId)
     {
         $orders = \App\Orders::distinct()->where('status', 'pending')->where('sender', $sender)->get(['orderId', 'created_at', 'sender']);
         foreach ($orders as $order) {
-            self::fire(Send::showSingleOrderList($sender, "Order No #" . $order->orderId, $order->orderId));
+            self::fire(Send::showSingleOrderList($sender, "Order No #" . $order->orderId, $order->orderId), $pagId);
         }
         exit;
     }
 
-    public static function myCart($sender)
+    public static function myCart($sender, $pageId)
     {
         $myOrders = Cart::where('sender', $sender)
             ->where('status', 'pending')
@@ -902,35 +884,35 @@ class Run extends Controller
 
         foreach ($myOrders as $order) {
             if ($order->type == "woo") {
-                $woo = new WooProduct($order->productid);
+                $woo = new WooProduct($order->productid,$pageId);
 
 
                 $count++;
                 $price += $woo->price;
-                self::fire(Send::showSingleCart($sender, $woo->name . " (Price :" . Data::getUnit() . $woo->price . ")", strip_tags($woo->shortDescription), $woo->image, $order->id));
+                self::fire(Send::showSingleCart($sender, $woo->name . " (Price :" . Data::getUnit($pageId) . $woo->price . ")", strip_tags($woo->shortDescription), $woo->image, $order->id), $pageId);
 
             } else {
                 foreach (Products::where('id', $order->productid)->get() as $por) {
 
                     $count++;
                     $price += $por->price;
-                    self::fire(Send::showSingleCart($sender, $por->title, $por->short_description . "\nPrice :" . Data::getUnit() . $por->price . "\n", url('/uploads') . "/" . $por->image, $order->id));
+                    self::fire(Send::showSingleCart($sender, $por->title, $por->short_description . "\nPrice :" . Data::getUnit($pageId) . $por->price . "\n", url('/uploads') . "/" . $por->image, $order->id), $pageId);
                 }
             }
 
         }
-        self::fire(Send::sendText($sender, "Total product : " . $count));
-        self::fire(Send::sendText($sender, "Total Cost : " . Data::getUnit() . $price));
+        self::fire(Send::sendText($sender, "Total product : " . $count), $pageId);
+        self::fire(Send::sendText($sender, "Total Cost : " . Data::getUnit($pageId) . $price), $pageId);
         if ($count != 0) {
-            Send::askForOrder($sender);
+            Send::askForOrder($sender, $pageId);
         }
 
     }
 
-    public static function showFeaturedProducts($sender)
+    public static function showFeaturedProducts($sender, $pageId)
     {
-        if (Products::where('featured', 'yes')->where('status', 'published')->count() == 0) {
-            self::fire(Send::sendText($sender, "Sorry , couldn't find featured products"));
+        if (Products::where('featured', 'yes')->where('status', 'published')->where('pageId', $pageId)->count() == 0) {
+            self::fire(Send::sendText($sender, "Sorry , couldn't find featured products"), $pageId);
 
             exit;
         }
@@ -944,25 +926,25 @@ class Run extends Controller
                 $btnOrder = [
                     "type" => "postback",
                     "payload" => "cart_" . $sender . "_" . $pro->id . "_" . "babsha",
-                    "title" => Data::translate("Add to cart", Data::getUserLang($sender))
+                    "title" => "Add to cart"
                 ];
 
 
                 $btnDetails = [
                     "type" => "postback",
                     "payload" => "details_" . $pro->id,
-                    "title" => Data::translate("Product Details", Data::getUserLang($sender))
+                    "title" => "Product Details"
                 ];
 
                 $btnBack = [
                     "type" => "postback",
                     "payload" => "view_products",
-                    "title" => Data::translate("Back", Data::getUserLang($sender))
+                    "title" => "Back"
                 ];
-                array_push($products, Send::elements($pro->title . " (" . Data::getUnit() . $pro->price . ")", Data::translate($pro->short_description, Data::getUserLang($sender)), url('/uploads') . "/" . $pro->image, [$btnOrder, $btnDetails, $btnBack]));
+                array_push($products, Send::elements($pro->title . " (" . Data::getUnit($pageId) . $pro->price . ")", $pro->short_description, url('/uploads') . "/" . $pro->image, [$btnOrder, $btnDetails, $btnBack]));
             }
             $jsonData = Send::item($sender, $products);
-            self::fire($jsonData);
+            self::fire($jsonData, $pageId);
             $products = [];
 
         }

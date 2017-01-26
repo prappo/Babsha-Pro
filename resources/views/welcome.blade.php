@@ -8,8 +8,7 @@
                     <div class="panel-heading">Welcome</div>
 
                     <div align="center" class="panel-body">
-                        <img height="80" width="80" src="@if(\App\Http\Controllers\Data::getLogo() == ""){{url('/images/logo.png')}} @else {{\App\Http\Controllers\Data::getLogo()}} @endif">
-                        <h1 style="color:#8FBCFF">{{\App\Http\Controllers\Data::getShopTitle()}}</h1>
+                        Welcome
                     </div>
                 </div>
             </div>

@@ -178,7 +178,7 @@ class Products extends Controller
             $product->userId = Auth::user()->id;
             $product->pageId = $re->pageId;
             $product->save();
-            Customer::sendProductNotification($re->title,$re->shortDescription,$re->image,Data::getUnit().$re->price);
+            Customer::sendProductNotification($re->title,$re->shortDescription,$re->image,Data::getUnit($re->pageId).$re->price,$re->pageId);
             return "success";
         }
 

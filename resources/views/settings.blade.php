@@ -44,7 +44,7 @@
                                 <label for="subTitle" class="col-md-4 control-label">Shop Sub Title</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getShopSubTitle()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('subTitle')}}"
                                            class="form-control" id="subTitle">
 
                                 </div>
@@ -54,7 +54,7 @@
                                 <label for="phone" class="col-md-4 control-label">Phone</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getPhone()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('phone')}}"
                                            class="form-control" id="phone">
 
                                 </div>
@@ -64,7 +64,7 @@
                                 <label for="email" class="col-md-4 control-label">Email</label>
 
                                 <div class="col-md-6">
-                                    <input type="email" value="{{\App\Http\Controllers\Data::getEmail()}}"
+                                    <input type="email" value="{{\App\Settings::where('userId',Auth::user()->id)->value('email')}}"
                                            class="form-control" id="email">
 
                                 </div>
@@ -74,7 +74,7 @@
                                 <label for="address" class="col-md-4 control-label">Address</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getShopAddress()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('address')}}"
                                            class="form-control" id="address">
 
                                 </div>
@@ -84,7 +84,7 @@
                                 <label for="afterOrderMsg" class="col-md-4 control-label">After order Message</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getAfterOrderMsg()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('afterOrderMsg')}}"
                                            class="form-control" id="afterOrderMsg">
 
                                 </div>
@@ -94,7 +94,7 @@
                                 <label for="map" class="col-md-4 control-label">Map Data</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getMapData()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('map')}}"
                                            class="form-control" id="map">
 
                                 </div>
@@ -111,7 +111,7 @@
                                                id="file"/><br>
                                         <input class="btn btn-xs btn-success" type="submit" value="Upload"
                                                id="imgUploadBtn"/>
-                                        <input type="hidden" value="{{\App\Http\Controllers\Data::getLogoData()}}"
+                                        <input type="hidden" value="{{\App\Settings::where('userId',Auth::user()->id)->value('logo')}}"
                                                id="image">
                                         <div id="imgMsg"></div>
                                     </form>
@@ -124,20 +124,20 @@
 
                                 <div class="col-md-6">
                                     <select class="form-control" id="currency">
-                                        <option <?php if (\App\Http\Controllers\Data::getCurrency() == "USD") {
+                                        <option <?php if (\App\Settings::where('userId',Auth::user()->id)->value('currency') == "USD") {
                                             echo "selected";
                                         } ?> >USD
                                         </option>
-                                        <option <?php if (\App\Http\Controllers\Data::getCurrency() == "EURO") {
+                                        <option <?php if (\App\Settings::where('userId',Auth::user()->id)->value('currency') == "EURO") {
                                             echo "selected";
                                         } ?> >EURO
                                         </option>
-                                        <option <?php if (\App\Http\Controllers\Data::getCurrency() == "BDT") {
+                                        <option <?php if (\App\Settings::where('userId',Auth::user()->id)->value('currency') == "BDT") {
                                             echo "selected";
                                         } ?> >BDT
                                         </option>
 
-                                        <option <?php if (\App\Http\Controllers\Data::getCurrency() == "GBP") {
+                                        <option <?php if (\App\Settings::where('userId',Auth::user()->id)->value('currency') == "GBP") {
                                             echo "selected";
                                         } ?> >GBP
                                         </option>
@@ -150,7 +150,7 @@
                                 <label for="tax" class="col-md-4 control-label">Tax</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getTax()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('tax')}}"
                                            class="form-control" id="tax">
 
                                 </div>
@@ -161,7 +161,7 @@
                                 <label for="shipping" class="col-md-4 control-label">Shipping Cost</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Data::getShippingCost()}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('shipping')}}"
                                            class="form-control" id="shipping">
 
                                 </div>

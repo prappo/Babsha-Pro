@@ -7,8 +7,7 @@
                     <div class="panel-heading">Welcome</div>
 
                     <div align="center" class="panel-body">
-                        <img height="80" width="80" src="<?php if(\App\Http\Controllers\Data::getLogo() == ""): ?><?php echo e(url('/images/logo.png')); ?> <?php else: ?> <?php echo e(\App\Http\Controllers\Data::getLogo()); ?> <?php endif; ?>">
-                        <h1 style="color:#8FBCFF"><?php echo e(\App\Http\Controllers\Data::getShopTitle()); ?></h1>
+                        Welcome
                     </div>
                 </div>
             </div>

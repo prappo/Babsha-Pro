@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\FacebookPages;
+use App\Settings;
 use Automattic\WooCommerce\Client;
 use Illuminate\Http\Request;
 
@@ -18,11 +20,12 @@ class WooProduct extends Controller
     public $url;
 
 
-    public function __construct($id)
+    public function __construct($id,$pageId)
     {
-        $woo = new Client(Settings::get('wpUrl'),
-            Settings::get('wooConsumerKey'),
-            Settings::get('wooConsumerSecret'),
+        $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+        $woo = new Client(Settings::where('userId',$userId)->value('wpUrl'),
+            Settings::where('userId',$userId)->value('wooConsumerKey'),
+            Settings::where('userId',$userId)->value('wooConsumerSecret'),
             [
                 'wp_api' => true,
                 'version' => 'wc/v1',
