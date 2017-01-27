@@ -16,8 +16,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/prappo', 'Prappo@index');
-Route::get('/payment/{userID}', 'PayPalController@paymentRequest');
-Route::get('/success/payment/{userId}', 'PayPalController@success');
+Route::get('/payment/{userID}/{pageId}', 'PayPalController@paymentRequest');
+Route::get('/success/payment/{userId}/{pageId}', 'PayPalController@success');
 Route::get('/cancel/payment', 'PayPalController@cancel');
 Route::get('/payment', 'PayPalController@index');
 Route::get('/checkout/{user}', 'Checkout@index');

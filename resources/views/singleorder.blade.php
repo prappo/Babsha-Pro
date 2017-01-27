@@ -85,7 +85,7 @@
                                         $totalItem = $totalItem + (\App\Orders::where('productid', $order->productid)->where('orderId', $orderNumber)->count());
 
                                         if ($order->type == "woo") {
-                                            $woo = new \App\Http\Controllers\WooProduct($order->productid);
+                                            $woo = new \App\Http\Controllers\Woo($order->productid);
                                             $subTotal = $subTotal + ($woo->price * (\App\Orders::where('productid', $order->productid)->where('orderId', $orderNumber)->count()));
                                         } else {
                                             $subTotal = $subTotal + (\App\Products::where('id', $order->productid)->value('price')) * (\App\Orders::where('productid', $order->productid)->where('orderId', $orderNumber)->count());
@@ -134,13 +134,13 @@
 
                                             </div>
                                             @if($order->type == "woo")
-                                                <div class="col-md-2">{{\App\Http\Controllers\Data::getUnit()}}{{$woo->price}}</div>
+                                                <div class="col-md-2">{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$woo->price}}</div>
                                                 <div class="col-md-2">{{ (\App\Orders::where('productid',$order->productid)->where('orderId',$orderNumber)->count())}}</div>
-                                                <div class="col-md-2">{{\App\Http\Controllers\Data::getUnit()}}{{$woo->price * (\App\Orders::where('productid',$order->productid)->where('orderId',$orderNumber)->count())}}</div>
+                                                <div class="col-md-2">{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$woo->price * (\App\Orders::where('productid',$order->productid)->where('orderId',$orderNumber)->count())}}</div>
                                             @else
-                                                <div class="col-md-2">{{\App\Http\Controllers\Data::getUnit()}}{{\App\Products::where('id',$order->productid)->value('price')}}</div>
+                                                <div class="col-md-2">{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Products::where('id',$order->productid)->value('price')}}</div>
                                                 <div class="col-md-2">{{ (\App\Orders::where('productid',$order->productid)->where('orderId',$orderNumber)->count())}}</div>
-                                                <div class="col-md-2">{{\App\Http\Controllers\Data::getUnit()}}{{(\App\Products::where('id',$order->productid)->value('price')) * (\App\Orders::where('productid',$order->productid)->where('orderId',$orderNumber)->count())}}</div>
+                                                <div class="col-md-2">{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{(\App\Products::where('id',$order->productid)->value('price')) * (\App\Orders::where('productid',$order->productid)->where('orderId',$orderNumber)->count())}}</div>
                                             @endif
                                         </div>
                                     @endforeach
@@ -152,7 +152,7 @@
                                         <div class="col-md-2">Total quantity :</div>
                                         <div class="col-md-2"><b>{{$totalItem}}</b></div>
                                         <div class="col-md-2">
-                                            <b>{{\App\Http\Controllers\Data::getUnit()}}{{$subTotal}}</b></div>
+                                            <b>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$subTotal}}</b></div>
                                     </div>
 
                                     <div class="row">
@@ -160,7 +160,7 @@
                                         <div class="col-md-2"></div>
                                         <div class="col-md-2"><b>Tax</b></div>
                                         <div class="col-md-2">
-                                            <b>{{\App\Http\Controllers\Data::getUnit()}}{{$tax = \App\Http\Controllers\Data::getTax()}}</b>
+                                            <b>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$tax = \App\Settings::where('userId',Auth::user()->id)->value('tax')}}</b>
                                         </div>
                                     </div>
 
@@ -169,7 +169,7 @@
                                         <div class="col-md-2"></div>
                                         <div class="col-md-2"><b>Shipping Cost</b></div>
                                         <div class="col-md-2">
-                                            <b>{{\App\Http\Controllers\Data::getUnit()}}{{\App\Http\Controllers\Data::getShippingCost()}}</b>
+                                            <b>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Settings::where('userId',Auth::user()->id)->value('shipping')}}</b>
                                         </div>
                                     </div>
                                     <div style="border-top: 1px solid #8c8b8b;">
@@ -178,7 +178,7 @@
                                             <div class="col-md-2"></div>
                                             <div class="col-md-2"><b>Total Cost : </b></div>
                                             <div class="col-md-2">
-                                                <b>{{\App\Http\Controllers\Data::getUnit()}}{{\App\Http\Controllers\Data::getShippingCost() + \App\Http\Controllers\Data::getTax() + $subTotal}}</b>
+                                                <b>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Settings::where('userId',Auth::user()->id)->value('shipping') + \App\Settings::where('userId',Auth::user()->id)->value('tax') + $subTotal}}</b>
                                             </div>
                                         </div>
                                     </div>

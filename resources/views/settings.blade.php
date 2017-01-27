@@ -181,7 +181,7 @@
                                 <label for="paypalClientId" class="col-md-4 control-label">PayPal Client ID</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" value="{{\App\Http\Controllers\Settings::get('paypalClientId')}}"
+                                    <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('paypalClientId')}}"
                                            class="form-control" id="paypalClientId">
 
                                 </div>
@@ -193,7 +193,7 @@
 
                                 <div class="col-md-6">
                                     <input type="text"
-                                           value="{{\App\Http\Controllers\Settings::get('paypalClientSecret')}}"
+                                           value="{{\App\Settings::where('userId',Auth::user()->id)->value('paypalClientSecret')}}"
                                            class="form-control" id="paypalClientSecret">
 
                                 </div>
@@ -204,7 +204,7 @@
                                     <label for="wpUrl" class="col-md-4 control-label">WordPress URL</label>
 
                                     <div class="col-md-6">
-                                        <input type="text" value="{{\App\Http\Controllers\Settings::get('wpUrl')}}"
+                                        <input type="text" value="{{\App\Settings::where('userId',Auth::user()->id)->value('wpUrl')}}"
                                                class="form-control" id="wpUrl">
 
                                     </div>
@@ -215,7 +215,7 @@
 
                                     <div class="col-md-6">
                                         <input type="text"
-                                               value="{{\App\Http\Controllers\Settings::get('wooConsumerKey')}}"
+                                               value="{{\App\Settings::where('userId',Auth::user()->id)->value('wooConsumerKey')}}"
                                                class="form-control" id="wooConsumerKey">
 
                                     </div>
@@ -226,7 +226,7 @@
 
                                     <div class="col-md-6">
                                         <input type="text"
-                                               value="{{\App\Http\Controllers\Settings::get('wooConsumerSecret')}}"
+                                               value="{{\App\Settings::where('userId',Auth::user()->id)->value('wooConsumerSecret')}}"
                                                class="form-control" id="wooConsumerSecret">
 
                                     </div>

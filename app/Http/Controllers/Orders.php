@@ -49,7 +49,7 @@ class Orders extends Controller
         $userId = $re->userId;
         $msg = $re->msg;
         try {
-            Run::fire(Send::sendText($userId, $msg));
+            Run::fire(Send::sendText($userId, $msg),$re->pageId);
 
         } catch (\Exception $e) {
             return "error";
@@ -111,7 +111,7 @@ class Orders extends Controller
     {
         $userId = $re->userId;
         try {
-            Run::fire(Send::updateInfo($userId));
+            Run::fire(Send::updateInfo($userId),$re->pageId);
             return "success";
         } catch (\Exception $e) {
             return "Something went wrong please try again later";
@@ -133,15 +133,16 @@ class Orders extends Controller
         $subTotal = 0;
         $wooCount = 0;
         $pCount = 0;
+        $pageId = $re->pageId;
         foreach ($orders as $order) {
             $sender = $order->sender;
             $quantity = \App\Orders::where('status', 'pending')->where('sender', $sender)->where('productid', $order->productid)->count();
             if($order->type == "woo"){
                 $wooCount++;
-                $wooProduct = new WooProduct($order->productid);
+                $wooProduct = new Woo($order->productid);
                 array_push($items, [
                     'title' => $wooProduct->name,
-                    'subtitle' => "Unit price : (" . Data::getUnit() . $wooProduct->price . ") \n" .  $wooProduct->shortDescription,
+                    'subtitle' => "Unit price : (" . Data::getUnit($re->pageId) . $wooProduct->price . ") \n" .  $wooProduct->shortDescription,
                     'quantity' => $quantity,
                     'price' => $wooProduct->price * $quantity,
                     'image_url' => $wooProduct->image
@@ -152,7 +153,7 @@ class Orders extends Controller
                 $pCount++;
                 array_push($items, [
                     'title' => Products::where('id', $order->productid)->value('title'),
-                    'subtitle' => "Unit price : (" . Data::getUnit() . Products::where('id', $order->productid)->value('price') . ") \n" . Products::where('id', $order->productid)->value('short_description'),
+                    'subtitle' => "Unit price : (" . Data::getUnit($pageId) . Products::where('id', $order->productid)->value('price') . ") \n" . Products::where('id', $order->productid)->value('short_description'),
                     'quantity' => $quantity,
                     'price' => Products::where('id', $order->productid)->value('price') * $quantity,
                     'image_url' => url('/uploads') . "/" . Products::where('id', $order->productid)->value('image')
@@ -170,8 +171,8 @@ class Orders extends Controller
             return "Cart is emptry";
         }
         $userId = $sender;
-        $total = $subTotal + Data::getTax() + Data::getShippingCost();
-        Run::fire(Send::receiptList($userId,Customers::where('fbId',$userId)->value('name'),$orderId,$items,$subTotal,$total,\App\Orders::where('orderId',$orderId)->value('method')));
+        $total = $subTotal + Data::getTax($pageId) + Data::getShippingCost($pageId);
+        Run::fire(Send::receiptList($userId,Customers::where('fbId',$userId)->value('name'),$orderId,$items,$subTotal,$total,\App\Orders::where('orderId',$orderId)->value('method'),$pageId),$pageId);
 
         try {
 

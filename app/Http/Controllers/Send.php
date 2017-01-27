@@ -414,12 +414,12 @@ class Send extends Controller
                             [
                                 "title" => $title,
                                 "image_url" => $image,
-                                "subtitle" => Data::translate($subTitle, Data::getUserLang($userId)),
+                                "subtitle" => $subTitle,
                                 "buttons" => [
 
                                     [
                                         "type" => "postback",
-                                        "title" => Data::translate("Remove", Data::getUserLang($userId)),
+                                        "title" => "Remove",
                                         "payload" => "cancel_" . $orderId
                                     ]
                                 ]
@@ -778,24 +778,24 @@ class Send extends Controller
         $btnYes = [
             "type" => "postback",
             "payload" => "view_products",
-            "title" => Data::translate("Yes", Data::getUserLang($sender))
+            "title" => "Yes"
         ];
 
 
         $btnCheckOut = [
             "type" => "postback",
             "payload" => "checkout",
-            "title" => Data::translate("Checkout", Data::getUserLang($sender))
+            "title" => "Checkout"
         ];
         $cartCount = Cart::where('sender', $sender)->count();
         $btnCart = [
             "type" => "postback",
             "payload" => "my_cart",
-            "title" => Data::translate("My Cart (" . $cartCount . ")", Data::getUserLang($sender))
+            "title" => "My Cart (" . $cartCount . ")"
         ];
 
 
-        array_push($buttons, Send::elements(Data::translate("Continue shopping ?", Data::getUserLang($sender)) . "", "", "", [$btnYes, $btnCart, $btnCheckOut]));
+        array_push($buttons, Send::elements("Continue shopping ?" . "", "", "", [$btnYes, $btnCart, $btnCheckOut]));
         $jsonData = Send::item($sender, $buttons);
         Run::fire($jsonData,$pageId);
     }
@@ -838,24 +838,24 @@ class Send extends Controller
         $btnPyaPal = [
             "type" => "postback",
             "payload" => "paypal",
-            "title" => Data::translate("Pay Via PayPal", Data::getUserLang($sender))
+            "title" => "Pay Via PayPal"
         ];
 
 
         $btnCash = [
             "type" => "postback",
             "payload" => "order",
-            "title" => Data::translate("Cash on delivery", Data::getUserLang($sender))
+            "title" => "Cash on delivery"
         ];
 
         $btnShopping = [
             "type" => "postback",
             "payload" => "view_products",
-            "title" => Data::translate("Continue Shopping", Data::getUserLang($sender))
+            "title" => "Continue Shopping"
         ];
 
 
-        array_push($buttons, Send::elements(Data::translate("Select a payment method", Data::getUserLang($sender)) . "", "", "", [$btnPyaPal, $btnCash, $btnShopping]));
+        array_push($buttons, Send::elements("Select a payment method" . "", "", "", [$btnPyaPal, $btnCash, $btnShopping]));
 
         $jsonData = Send::item($sender, $buttons);
         Run::fire($jsonData,$pageId);
@@ -903,10 +903,10 @@ class Send extends Controller
                     "payload" => [
                         "template_type" => "generic",
                         "elements" => [[
-                            "title" => Data::translate("Login to pay via PayPal", Data::getUserLang($userId)),
+                            "title" => "Login to pay via PayPal",
                             "buttons" => [[
                                 "type" => "account_link",
-                                "url" => url('/payment') . "/" . $userId
+                                "url" => url('/payment') . "/" . $userId."/".$pageId
                             ]]
                         ]]
                     ]

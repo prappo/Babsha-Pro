@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Cart;
 use App\Customers;
+use App\FacebookPages;
 use App\Orders;
 use App\Payments;
 use App\Products;
 use Illuminate\Http\Request;
-
+use App\Settings;
 use App\Http\Requests;
 use Facebook\HttpClients\FacebookGuzzleHttpClient;
 use GuzzleHttp\Client;
@@ -36,15 +37,16 @@ class PayPalController extends Controller
      */
 
 
-    public function paymentRequest($userID)
+    public function paymentRequest($userID,$pageId)
     {
-        if(Settings::get('paypalClientId') == "" || Settings::get('paypalClientSecret') == ""){
+        $uId = FacebookPages::where('pageId',$pageId)->value('userId');
+        if(Settings::where('userId',$uId)->value('paypalClientId') == "" || Settings::where('userId',$uId)->value('paypalClientSecret') == ""){
             return "PayPal not available . Please contact admin";
         }
         $accountToken = $_GET['account_linking_token'];
         $redirect_uri = $_GET['redirect_uri'];
         $orderNumber = uniqid();
-        $apiContext = new ApiContext(new OAuthTokenCredential(Settings::get('paypalClientId'), Settings::get('paypalClientSecret')));
+        $apiContext = new ApiContext(new OAuthTokenCredential(Settings::where('userId',$uId)->value('paypalClientId'), Settings::where('userId',$uId)->value('paypalClientSecret')));
         $payer = new Payer();
 
         $payer->setPaymentMethod("paypal");
@@ -63,10 +65,10 @@ class PayPalController extends Controller
             $items[$index] = new Item();
             $quantity = Cart::where('sender', $userID)->where('productid', $item->productid)->count();
             if($item->type == "woo"){
-            $woo = new WooProduct($item->productid);
+            $woo = new WooProduct($item->productid,$pageId);
                 $productPrice = $item->price;
                 $items[$index]->setName($woo->name)
-                    ->setCurrency(Data::getCurrency())
+                    ->setCurrency(Data::getCurrency($pageId))
                     ->setQuantity($quantity)
                     ->setSku($item->productid)
                     ->setPrice($productPrice);
@@ -77,7 +79,7 @@ class PayPalController extends Controller
             }else{
                 $productPrice = Products::where('id', $item->productid)->value('price');
                 $items[$index]->setName(Products::where('id', $item->productid)->value('title'))
-                    ->setCurrency(Data::getCurrency())
+                    ->setCurrency(Data::getCurrency($pageId))
                     ->setQuantity($quantity)
                     ->setSku($item->productid)
                     ->setPrice($productPrice);
@@ -90,7 +92,7 @@ class PayPalController extends Controller
 
         }
 
-        $total = (int)$subTotal + (int)Data::getTax() + (int)Data::getShippingCost();
+        $total = (int)$subTotal + (int)Data::getTax($pageId) + (int)Data::getShippingCost($pageId);
 
         $itemList = new ItemList();
 
@@ -98,8 +100,8 @@ class PayPalController extends Controller
 
 
         $details = new Details();
-        $details->setShipping(Data::getShippingCost())
-            ->setTax(Data::getTax())
+        $details->setShipping(Data::getShippingCost($pageId))
+            ->setTax(Data::getTax($pageId))
             ->setSubtotal($subTotal);
 
 
@@ -118,7 +120,7 @@ class PayPalController extends Controller
 
         $baseUrl = url('/');
         $redirectUrls = new RedirectUrls();
-        $redirectUrls->setReturnUrl("$baseUrl/success/payment/" . $userID . "?accountToken=" . $accountToken . "&redirectUri=" . $redirect_uri . "&total=" . $total . "&orderNumber=" . $orderNumber)
+        $redirectUrls->setReturnUrl("$baseUrl/success/payment/" . $userID ."/".$pageId. "?accountToken=" . $accountToken . "&redirectUri=" . $redirect_uri . "&total=" . $total . "&orderNumber=" . $orderNumber)
             ->setCancelUrl("$baseUrl/cancel/payment");
 
 
@@ -155,7 +157,7 @@ class PayPalController extends Controller
      * after successful payment
      *
      */
-    public function success($userId)
+    public function success($userId,$pageId)
     {
         $accountToken = $_GET['accountToken'];
         $redirectUri = $_GET['redirectUri'];
@@ -164,7 +166,7 @@ class PayPalController extends Controller
         $PayerID = $_GET['PayerID'];
         $orderNumber = $_GET['orderNumber'];
         $total = $_GET['total'];
-
+        $uId = FacebookPages::where('pageId',$pageId)->value('userId');
         $cart = Cart::where('sender', $userId)->get();
         foreach ($cart as $c) {
             $newOrder = new \App\Orders();
@@ -176,12 +178,14 @@ class PayPalController extends Controller
             $newOrder->method = "PaYpal";
             $newOrder->payment = "Paid";
             $newOrder->type = $c->type;
+            $newOrder->userId = $uId;
+            $newOrder->pageId = $pageId;
             $newOrder->save();
         }
         try {
             Cart::where('sender', $userId)->delete();
         } catch (\Exception $e) {
-            Run::fire(Send::sendText($userId, "Something went wrong we couldn't remove products form cart"));
+            Run::fire(Send::sendText($userId, "Something went wrong we couldn't remove products form cart"),$pageId);
         }
         try{
 
@@ -191,18 +195,19 @@ class PayPalController extends Controller
             $paymentInfo->paymentId = $paymentId;
             $paymentInfo->token = $token;
             $paymentInfo->payerId = $PayerID;
+            $paymentInfo->userId = $userId;
             $paymentInfo->amount = $total;
             $paymentInfo->save();
         }
         catch (\Exception $e){
-            Run::fire(Send::sendText($userId,"Something went wrong . We couldn't store your payment information ."));
+            Run::fire(Send::sendText($userId,"Something went wrong . We couldn't store your payment information ."),$pageId);
         }
-        Run::fire(Send::sendText($userId,'Payment successfully received'));
-        Run::fire(Send::sendText($userId, Data::getAfterOrderMsg()));
-        Run::fire(Send::sendText($userId, "Your Order ID #" . $orderNumber));
-        Run::fire(Send::sendText($userId, "Your Payment ID " . $paymentId));
-        Run::fire(Send::sendText($userId, "Your Payer ID " . $PayerID));
-        Run::fire(Send::updateInfo($userId));
+        Run::fire(Send::sendText($userId,'Payment successfully received'),$pageId);
+        Run::fire(Send::sendText($userId, Data::getAfterOrderMsg($pageId)),$pageId);
+        Run::fire(Send::sendText($userId, "Your Order ID #" . $orderNumber),$pageId);
+        Run::fire(Send::sendText($userId, "Your Payment ID " . $paymentId),$pageId);
+        Run::fire(Send::sendText($userId, "Your Payer ID " . $PayerID),$pageId);
+        Run::fire(Send::updateInfo($userId),$pageId);
         Data::notify(Customers::where('fbId',$userId)->value('name'). " placed the order and paid via PayPal");
         return view('paymentsuccess', compact('accountToken', 'redirectUri'));
     }

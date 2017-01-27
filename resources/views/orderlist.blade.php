@@ -27,7 +27,7 @@
                             @foreach($orders as $order)
                                 <tr>
                                     <td><a href="{{url('/order')}}/{{$order->orderId}}">#{{$order->orderId}}</a></td>
-                                    <td>{{\App\Orders::where('orderId',$order->orderId)->count()}} @if(\App\Orders::where('productid',$order->productId)->count() > 1)
+                                    <td>{{\App\Orders::where('orderId',$order->orderId)->where('userId',Auth::user()->id)->count()}} @if(\App\Orders::where('productid',$order->productId)->count() > 1)
                                             Item @else Items @endif </td>
                                     <td>@if(\App\Http\Controllers\Customer::getAdddress($order->sender) == "none"){{\App\Http\Controllers\Customer::getName($order->sender)}}
                                         ,{{\App\Http\Controllers\Customer::getStreet($order->sender)}}
@@ -36,7 +36,7 @@
                                     <td>{{$order->created_at}}</td>
                                     <td>
 
-                                        {{\App\Http\Controllers\Data::getUnit()}}{{\App\Orders::where('orderId',$order->orderId)->sum('price')}}
+                                        {{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Orders::where('orderId',$order->orderId)->sum('price')}}
 
                                     </td>
                                     <td>

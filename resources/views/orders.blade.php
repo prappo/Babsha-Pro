@@ -34,7 +34,7 @@
                             <tbody>
                             <tr>
                                 <th>Price</th>
-                                <td>{{\App\Http\Controllers\Data::getUnit()}}{{\App\Products::where('id',$order->productid)->value('price')}}</td>
+                                <td>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Products::where('id',$order->productid)->value('price')}}</td>
 
                             </tr>
 
@@ -106,7 +106,7 @@
                     $unitPrice = \App\Products::where('id', $order->productid)->value('price');
                     $quantity = \App\Orders::where('productid', $order->productid)->where('sender', $order->sender)->where('status', 'pending')->count();
                     $totalCost = $quantity * $unitPrice;
-                    $subTotal = $totalCost + \App\Http\Controllers\Data::getTax() + \App\Http\Controllers\Data::getShippingCost();
+                    $subTotal = $totalCost + \App\Settings::where('userId',Auth::user()->id)->value('tax') + \App\Settings::where('userId',Auth::user()->id)->value('shipping');
                     $shortDescription = \App\Products::where('id', $order->productid)->value('short_description');
                     $title = \App\Products::where('id', $order->productid)->value('title');
                     $image = \App\Products::where('id', $order->productid)->value('image');
@@ -145,23 +145,23 @@
                         </tr>
                         <tr>
                             <th>Unit price</th>
-                            <td>{{\App\Http\Controllers\Data::getUnit()}}{{$unitPrice}}</td>
+                            <td>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$unitPrice}}</td>
                         </tr>
                         <tr>
                             <th>Total Cost</th>
-                            <td>{{\App\Http\Controllers\Data::getUnit()}}{{$totalCost}}</td>
+                            <td>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$totalCost}}</td>
                         </tr>
                         <tr>
                             <th>Tax</th>
-                            <td>{{\App\Http\Controllers\Data::getUnit()}}{{\App\Http\Controllers\Data::getTax()}}</td>
+                            <td>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Http\Controllers\Data::getTax()}}</td>
                         </tr>
                         <tr>
                             <th>Shipping Cost</th>
-                            <td>{{\App\Http\Controllers\Data::getUnit()}}{{\App\Http\Controllers\Data::getShippingCost()}}</td>
+                            <td>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{\App\Http\Controllers\Data::getShippingCost()}}</td>
                         </tr>
                         <tr>
                             <th>Sub Total</th>
-                            <td>{{\App\Http\Controllers\Data::getUnit()}}{{$subTotal}}</td>
+                            <td>{{\App\Settings::where('userId',Auth::user()->id)->value('currency')}}{{$subTotal}}</td>
                         </tr>
                         </tbody>
                     </table>
