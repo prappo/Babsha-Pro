@@ -106,6 +106,7 @@ class Run extends Controller
                     $customer->mobile = "none";
                     $customer->lang = $lang;
                     $customer->pageId = $pageId;
+                    $customer->userId = FacebookPages::where('pageId', $pageId)->value('userId');
                     $customer->save();
                 } catch (\Exception $exception) {
 
@@ -127,8 +128,24 @@ class Run extends Controller
                  * find if existed in array
                  *
                  * */
+                $arr = ["hi", "Hi", "hello", "Hello"];
 
-                if (Bot::checkPer($message) >= 65) {
+                if (in_array($message, $arr)) {
+                    if (Customers::where('fbId', $sender)->where('pageId', $pageId)->exists()) {
+                        self::fire(Send::sendText($sender, "Welcome back " . Customers::where('fbId', $sender)->value('name')), $pageId);
+                        self::fire(Send::sendText($sender, "Check out our menu"), $pageId);
+                        self::fire(Send::sendText($sender, "Or, If you need more help please type 'help'"), $pageId);
+                        self::fire(self::getMenu($sender, $pageId), $pageId);
+                        exit;
+
+                    } else {
+                        self::fire(Send::sendText($sender, "Hi " . Customers::where('fbId', $sender)->value('name')), $pageId);
+                        self::fire(Send::sendText($sender, "Check out our menu"), $pageId);
+                        self::fire(Send::sendText($sender, "Or, If you need more help please type 'help'"), $pageId);
+                        self::fire(self::getMenu($sender, $pageId), $pageId);
+                        exit;
+                    }
+                } elseif (Bot::checkPer($message) >= 65) {
 
                     self::fire(Send::sendMessage($sender, Bot::check($message, $pageId)), $pageId);
                     exit;
@@ -186,7 +203,7 @@ class Run extends Controller
 
                         $msgArr = ["Oops, I didn't catch that. For things I can help you with, type 'help' or check out our menu.", "I’m sorry; I’m not sure I understand. Try typing 'help' or check out our menu"];
                         $index = array_rand($msgArr);
-                        self::fire(Send::sendText($sender,$msgArr[$index]), $pageId);
+                        self::fire(Send::sendText($sender, $msgArr[$index]), $pageId);
                         exit;
 
 
@@ -235,7 +252,7 @@ class Run extends Controller
                     self::fire($jsonData, $pageId);
                     exit;
                 } elseif ($postback == "subscribe") {
-                    self::fire(Send::sendText($sender, Customer::subscribe($sender,$pageId)), $pageId);
+                    self::fire(Send::sendText($sender, Customer::subscribe($sender, $pageId)), $pageId);
                     exit;
                 } elseif ($postback == "user_orders") {
 //                    $myOrders = \App\Orders::where('sender', $sender)->where('status', 'pending')->get();
@@ -327,7 +344,7 @@ class Run extends Controller
                             }
                         }
                         if ($type == "woo") {
-                            $wooProduct = new WooProduct($productId,$pageId);
+                            $wooProduct = new WooProduct($productId, $pageId);
                             $cart = new Cart();
                             $cart->orderId = $orderId;
                             $cart->sender = $sender;
@@ -335,7 +352,7 @@ class Run extends Controller
                             $cart->status = "pending";
                             $cart->price = $wooProduct->price;
                             $cart->type = $type;
-                            $cart->userId = FacebookPages::where('pageId',$pageId)->value('userId');
+                            $cart->userId = FacebookPages::where('pageId', $pageId)->value('userId');
                             $cart->pageId = $pageId;
                             $cart->save();
                         } else {
@@ -347,7 +364,7 @@ class Run extends Controller
                             $cart->status = "pending";
                             $cart->price = $productPrice;
                             $cart->type = $type;
-                            $cart->userId = FacebookPages::where('pageId',$pageId)->value('userId');
+                            $cart->userId = FacebookPages::where('pageId', $pageId)->value('userId');
                             $cart->pageId = $pageId;
                             $cart->save();
                         }
@@ -884,7 +901,7 @@ class Run extends Controller
 
         foreach ($myOrders as $order) {
             if ($order->type == "woo") {
-                $woo = new WooProduct($order->productid,$pageId);
+                $woo = new WooProduct($order->productid, $pageId);
 
 
                 $count++;

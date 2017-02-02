@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Customers;
+use App\FacebookPages;
 use App\Income;
 use App\Products;
 use Illuminate\Http\Request;
@@ -188,6 +189,7 @@ class Orders extends Controller
             $income = new Income();
             $income->money = (int)$subTotal;
             $income->orderid = $orderId;
+            $income->userId = FacebookPages::where('pageId',$pageId)->value('userId');
             $income->save();
             return "success";
         } catch (\Exception $e) {

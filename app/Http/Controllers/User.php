@@ -34,7 +34,7 @@ class User extends Controller
             $user = new \App\User();
             $user->name = $request->name;
             $user->email = $request->email;
-            $user->password = bcrypt($request->pass);
+            $user->password = bcrypt($request->password);
             $user->type = "user";
             $user->save();
 

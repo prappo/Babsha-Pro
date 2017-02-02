@@ -199,11 +199,13 @@
                                 </li>
 
                                 <li><a href="{{ url('/addproduct') }}"><i class="fa fa-btn fa-plus"></i> Add new Product</a>
+                                <hr>
                                 <li><a href="{{url('/showcategory') }}"><i class="fa fa-th"></i> View Categories</a>
                                 </li>
                                 <li><a href="{{ url('/addcategory') }}"><i class="fa fa-btn fa-plus"></i> Add new
                                         category</a></li>
                                 </li>
+                                <hr>
                                 <li><a href="{{url('/showproducts/woo') }}"><i class="fa fa-wordpress"></i> View
                                         WooCommerce Products</a></li>
                                 <li><a href="{{ url('/woo/addcategory') }}"><i class="fa fa-btn fa-wordpress"></i> Add

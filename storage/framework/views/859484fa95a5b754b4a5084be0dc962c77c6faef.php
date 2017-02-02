@@ -201,11 +201,13 @@
                                 </li>
 
                                 <li><a href="<?php echo e(url('/addproduct')); ?>"><i class="fa fa-btn fa-plus"></i> Add new Product</a>
+                                <hr>
                                 <li><a href="<?php echo e(url('/showcategory')); ?>"><i class="fa fa-th"></i> View Categories</a>
                                 </li>
                                 <li><a href="<?php echo e(url('/addcategory')); ?>"><i class="fa fa-btn fa-plus"></i> Add new
                                         category</a></li>
                                 </li>
+                                <hr>
                                 <li><a href="<?php echo e(url('/showproducts/woo')); ?>"><i class="fa fa-wordpress"></i> View
                                         WooCommerce Products</a></li>
                                 <li><a href="<?php echo e(url('/woo/addcategory')); ?>"><i class="fa fa-btn fa-wordpress"></i> Add
