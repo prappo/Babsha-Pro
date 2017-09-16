@@ -521,7 +521,7 @@ class Send extends Controller
      * @param $image
      * @return string
      */
-    public static function receipt($userId, $orderNumber, $userName, $title, $shortDescription, $price, $quanity, $total, $subtotal, $street, $city, $postalCode, $state, $country, $image, $paymentMethod,$pageId)
+    public static function receipt($userId, $orderNumber, $userName, $title, $shortDescription, $price, $quanity, $total, $subtotal, $street, $city, $postalCode, $state, $country, $image, $paymentMethod, $pageId)
     {
 
         $data = [
@@ -573,7 +573,7 @@ class Send extends Controller
         return json_encode($data);
     }
 
-    public static function receiptList($userId, $userName, $orderNumber, $items, $subtotal, $total, $paymentMethod,$pageId)
+    public static function receiptList($userId, $userName, $orderNumber, $items, $subtotal, $total, $paymentMethod, $pageId)
     {
 
         $street = Customers::where('fbId', $userId)->value('street');
@@ -748,21 +748,23 @@ class Send extends Controller
 
     public function toUser(Request $request)
     {
+        $data = Customers::where('fbId', $request->sender)->first();
+        $pageId = $data->pageId;
         try {
             if ($request->message != "") {
-                $msg = Run::fire(self::sendMessage($request->sender, $request->message),$request->pageId);
+                 Run::fire(self::sendMessage($request->sender, $request->message), $pageId);
             }
 
             if ($request->image != "") {
-                $img = Run::fire(self::sendImage($request->sender, $request->image),$request->pageId);
+                Run::fire(self::sendImage($request->sender, $request->image), $pageId);
             }
 
             if ($request->audio != "") {
-                $audio = Run::fire(self::sendAudio($request->sender, $request->audio),$request->pageId);
+                Run::fire(self::sendAudio($request->sender, $request->audio), $pageId);
             }
 
             if ($request->video != "") {
-                $video = Run::fire(self::sendVideo($request->sender, $request->video),$request->pageId);
+                 Run::fire(self::sendVideo($request->sender, $request->video), $pageId);
             }
 
 
@@ -771,7 +773,7 @@ class Send extends Controller
         }
     }
 
-    public static function continueShoppin($sender,$pageId)
+    public static function continueShoppin($sender, $pageId)
     {
         $buttons = [];
 
@@ -797,11 +799,11 @@ class Send extends Controller
 
         array_push($buttons, Send::elements("Continue shopping ?" . "", "", "", [$btnYes, $btnCart, $btnCheckOut]));
         $jsonData = Send::item($sender, $buttons);
-        Run::fire($jsonData,$pageId);
+        Run::fire($jsonData, $pageId);
     }
 
 
-    public static function askForOrder($sender,$pageId)
+    public static function askForOrder($sender, $pageId)
     {
         $buttons = [];
 
@@ -828,10 +830,10 @@ class Send extends Controller
         array_push($buttons, Send::elements("Do you want to place order ?" . "", "", "", [$btnYes, $btnNo, $btnShopping]));
 
         $jsonData = Send::item($sender, $buttons);
-        Run::fire($jsonData,$pageId);
+        Run::fire($jsonData, $pageId);
     }
 
-    public static function paymentMethod($sender,$pageId)
+    public static function paymentMethod($sender, $pageId)
     {
         $buttons = [];
 
@@ -858,10 +860,10 @@ class Send extends Controller
         array_push($buttons, Send::elements("Select a payment method" . "", "", "", [$btnPyaPal, $btnCash, $btnShopping]));
 
         $jsonData = Send::item($sender, $buttons);
-        Run::fire($jsonData,$pageId);
+        Run::fire($jsonData, $pageId);
     }
 
-    public static function checkout($sender,$pageId)
+    public static function checkout($sender, $pageId)
     {
         $data = '{
   "recipient":{
@@ -888,10 +890,10 @@ class Send extends Controller
     }
   }
 }';
-        Run::fire($data,$pageId);
+        Run::fire($data, $pageId);
     }
 
-    public static function placeOrderViaPaypal($userId,$pageId)
+    public static function placeOrderViaPaypal($userId, $pageId)
     {
         $data = [
             "recipient" => [
@@ -906,7 +908,7 @@ class Send extends Controller
                             "title" => "Login to pay via PayPal",
                             "buttons" => [[
                                 "type" => "account_link",
-                                "url" => url('/payment') . "/" . $userId."/".$pageId
+                                "url" => url('/payment') . "/" . $userId . "/" . $pageId
                             ]]
                         ]]
                     ]
@@ -915,7 +917,7 @@ class Send extends Controller
         ];
 
 
-        Run::fire(json_encode($data),$pageId);
+        Run::fire(json_encode($data), $pageId);
 
     }
 

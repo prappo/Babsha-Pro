@@ -68,7 +68,7 @@ class Customer extends Controller
                 'country' => $country,
                 'postal_code' => $postal_code
             ]);
-            Run::fire(Send::sendMessage($fbId,"Thank you for updating shipping information"),$pageId);
+            Run::fire(Send::sendMessage($fbId, "Thank you for updating shipping information"), $pageId);
             return "success";
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -80,7 +80,7 @@ class Customer extends Controller
      * @param $sender
      * @return string
      */
-    public static function subscribe($sender,$pageId)
+    public static function subscribe($sender, $pageId)
     {
         if (Subscribe::where('fbId', $sender)->exists()) {
             $status = Subscribe::where('fbId', $sender)->value('status');
@@ -104,7 +104,7 @@ class Customer extends Controller
             }
         } else {
             $subscribe = new Subscribe();
-            $userId = FacebookPages::where('pageId',$pageId)->value('userId');
+            $userId = FacebookPages::where('pageId', $pageId)->value('userId');
             $subscribe->fbId = $sender;
             $subscribe->userId = $userId;
             $subscribe->status = "yes";
@@ -120,12 +120,12 @@ class Customer extends Controller
      * @param $image
      * @param $price
      */
-    public static function sendProductNotification($title, $shortDescription, $image, $price,$pageId)
+    public static function sendProductNotification($title, $shortDescription, $image, $price, $pageId)
     {
         foreach (Subscribe::where('status', 'yes')->get() as $user) {
-            Run::fire(Send::sendText($user->fbId,"New product added"),$pageId);
-            Run::fire(Send::sendImage($user->fbId,url('/uploads') . "/" . $image),$pageId);
-            Run::fire(Send::sendText($user->fbId, $title  . "\n" . $shortDescription . "\n" . $price),$pageId);
+            Run::fire(Send::sendText($user->fbId, "New product added"), $pageId);
+            Run::fire(Send::sendImage($user->fbId, url('/uploads') . "/" . $image), $pageId);
+            Run::fire(Send::sendText($user->fbId, $title . "\n" . $shortDescription . "\n" . $price), $pageId);
         }
     }
 
@@ -136,11 +136,11 @@ class Customer extends Controller
     public function notify(Request $re)
     {
         $msg = $re->msg;
-        $pageId = $re->pageId;
+
         try {
             $customers = Customers::all();
             foreach ($customers as $customer) {
-                Run::fire(Send::sendMessage($customer->fbId, $msg),$pageId);
+                Run::fire(Send::sendMessage($customer->fbId, $msg), $customer->pageId);
             }
         } catch (\Exception $e) {
             return "Something went wrong please try again later";
@@ -162,73 +162,74 @@ class Customer extends Controller
         }
     }
 
-    public static function getName($customerId){
-        $data = Customers::where('fbId',$customerId)->value('name');
+    public static function getName($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('name');
         return $data;
     }
 
-    public static function getStreet($customerId){
-        $data = Customers::where('fbId',$customerId)->value('street');
+    public static function getStreet($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('street');
         return $data;
     }
 
-    public static function getCity($customerId){
-        $data = Customers::where('fbId',$customerId)->value('city');
+    public static function getCity($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('city');
         return $data;
     }
 
-    public static function getPostalCode($customerId){
-        $data = Customers::where('fbId',$customerId)->value('postal_code');
+    public static function getPostalCode($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('postal_code');
         return $data;
     }
 
-    public static function getPhoneNumber($customerId){
-        $data = Customers::where('fbId',$customerId)->value('mobile');
+    public static function getPhoneNumber($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('mobile');
         return $data;
     }
 
-    public static function getCountry($customerId){
-        $data = Customers::where('fbId',$customerId)->value('country');
+    public static function getCountry($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('country');
         return $data;
     }
 
-    public static function getCoordinates($customerId){
-        $data = Customers::where('fbId',$customerId)->value('coordinates');
+    public static function getCoordinates($customerId)
+    {
+        $data = Customers::where('fbId', $customerId)->value('coordinates');
         return $data;
     }
 
-    public static function getAdddress($sender){
-        if(Customers::where('fbId',$sender)->value('address') != null){
-            return Customers::where('fbId',$sender)->value('address');
-        }
-        else{
+    public static function getAdddress($sender)
+    {
+        if (Customers::where('fbId', $sender)->value('address') != null) {
+            return Customers::where('fbId', $sender)->value('address');
+        } else {
             return "none";
         }
     }
 
 
-
-
-
-
-
-    public function botAction(Request $re){
-        $status = Customers::where('id',$re->id)->value('bot');
-        try{
-            if($status == 'no'){
-                Customers::where('id',$re->id)->update([
-                    'bot'=>'yes'
+    public function botAction(Request $re)
+    {
+        $status = Customers::where('id', $re->id)->value('bot');
+        try {
+            if ($status == 'no') {
+                Customers::where('id', $re->id)->update([
+                    'bot' => 'yes'
+                ]);
+                return "success";
+            } else {
+                Customers::where('id', $re->id)->update([
+                    'bot' => 'no'
                 ]);
                 return "success";
             }
-            else{
-                Customers::where('id',$re->id)->update([
-                    'bot'=>'no'
-                ]);
-                return "success";
-            }
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
 

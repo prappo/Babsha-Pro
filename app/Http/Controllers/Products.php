@@ -33,16 +33,15 @@ class Products extends Controller
                 'version' => 'wc/v1',
             ]
         );
-        try{
+        try {
             $wooCategories = $woo->get('products/categories');
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             $wooCategories = "none";
         }
 
-        $categories = Catagories::where('userId',Auth::user()->id)->get();
+        $categories = Catagories::where('userId', Auth::user()->id)->get();
 
-        return view('addproduct', compact('categories','wooCategories'));
+        return view('addproduct', compact('categories', 'wooCategories'));
     }
 
     /**
@@ -53,7 +52,6 @@ class Products extends Controller
     {
 
 
-
         $title = $re->title;
         $shortDescription = $re->shortDescription;
         $longDescription = $re->longDescription;
@@ -62,37 +60,31 @@ class Products extends Controller
         $category = $re->category;
         $featured = $re->featured;
 
-        if($title == "" || $shortDescription == "" || $longDescription == "" || $image == "" ){
+        if ($title == "" || $shortDescription == "" || $longDescription == "" || $image == "") {
             return "Please fill required field/fields";
         }
-        if(ctype_digit($category)){
-            if($re->postWp == "no") {
+        if (ctype_digit($category)) {
+            if ($re->postWp == "no") {
                 return "You can't select WooCommerce category because you are not creating WooCommerce product . Please select without WooCommerce category";
             }
         }
 
 
-
-
-
-
-
-
-        if($re->postFb == 'yes'){
+        if ($re->postFb == 'yes') {
             $pageToken = Data::getToken($re->pageId);
             $fb = new Facebook([
                 'app_id' => Data::getAppId(),
                 'app_secret' => Data::getAppSec(),
                 'default_graph_version' => 'v2.6',
             ]);
-            $data = $title."\n".$shortDescription."\n".$longDescription."\n".Data::getUnit().$price;
+            $data = $title . "\n" . $shortDescription . "\n" . $longDescription . "\n" . Data::getUnit() . $price;
             $content = [
                 "message" => $data,
                 "source" => $fb->fileToUpload(public_path() . "/uploads/" . $image)
 
             ];
 
-            try{
+            try {
                 $post = $fb->post('/me' . "/photos", $content, $pageToken);
                 $id = $post->getDecodedBody();
                 $fbPostId = $id['id'];
@@ -109,22 +101,18 @@ class Products extends Controller
                 $product->userId = Auth::user()->id;
                 $product->pageId = $re->pageId;
                 $product->save();
-                Customer::sendProductNotification($re->title,$re->shortDescription,$re->image,Data::getUnit().$re->price);
+                Customer::sendProductNotification($re->title, $re->shortDescription, $re->image, Data::getUnit() . $re->price, $re->pageId);
 
                 /* store product to database */
 
 
-
                 return "success";
-            }
-            catch (FacebookAuthenticationException $e){
+            } catch (FacebookAuthenticationException $e) {
                 return $e->getMessage();
-            }
-            catch (FacebookSDKException $d){
+            } catch (FacebookSDKException $d) {
                 return $d->getMessage();
             }
-        }
-        elseif ($re->postWp == "yes"){
+        } elseif ($re->postWp == "yes") {
 
             /* WooCommerce product add*/
 
@@ -150,21 +138,19 @@ class Products extends Controller
                 ],
                 'images' => [
                     [
-                        'src' => url('/uploads')."/".$image,
+                        'src' => url('/uploads') . "/" . $image,
                         'position' => 0
                     ]
                 ]
             ];
-            try{
-                 $woo->post('products',$data);
+            try {
+                $woo->post('products', $data);
                 return "success";
 
-            }
-            catch (\Exception $e){
+            } catch (\Exception $e) {
                 return $e->getMessage();
             }
-        }
-        else{
+        } else {
             $product = new \App\Products();
             $product->fbId = "notinfb";
             $product->title = $title;
@@ -178,7 +164,7 @@ class Products extends Controller
             $product->userId = Auth::user()->id;
             $product->pageId = $re->pageId;
             $product->save();
-            Customer::sendProductNotification($re->title,$re->shortDescription,$re->image,Data::getUnit($re->pageId).$re->price,$re->pageId);
+            Customer::sendProductNotification($re->title, $re->shortDescription, $re->image, Data::getUnit($re->pageId) . $re->price, $re->pageId);
             return "success";
         }
 
@@ -190,7 +176,7 @@ class Products extends Controller
      */
     public function showProducts()
     {
-        $data = \App\Products::where('userId',Auth::user()->id)->paginate(10);
+        $data = \App\Products::where('userId', Auth::user()->id)->paginate(10);
         return view('showproducts', compact('data'));
     }
 
@@ -200,16 +186,41 @@ class Products extends Controller
      */
     public function editProducts(Request $re)
     {
-        $fbId = \App\Products::where('id',$re->id)->value('fbId');
-        $fb = new Facebook([
-            'app_id' => Data::getAppId(),
-            'app_secret' => Data::getAppSec(),
-            'default_graph_version' => 'v2.6',
-        ]);
-
-        $data = $re->title."\n".$re->shortDescription."\n".$re->longDescription."\n".Data::getUnit().$re->price;
+//        $fbId = \App\Products::where('id',$re->id)->value('fbId');
+//        $fb = new Facebook([
+//            'app_id' => Data::getAppId(),
+//            'app_secret' => Data::getAppSec(),
+//            'default_graph_version' => 'v2.6',
+//        ]);
+//
+//        $data = $re->title."\n".$re->shortDescription."\n".$re->longDescription."\n".Data::getUnit().$re->price;
+//        try {
+//            $fb->post($fbId,['message'=>$data],Data::getToken());
+//            \App\Products::where('id', $re->id)->update([
+//                'title' => $re->title,
+//                'short_description' => $re->shortDescription,
+//                'long_description' => $re->longDescription,
+//                'image' => $re->image,
+//                'price' => $re->price,
+//                'category' => $re->category,
+//                'featured' => $re->featured
+//            ]);
+//
+//            return 'success';
+//        } catch (\Exception $e) {
+//            \App\Products::where('id', $re->id)->update([
+//                'title' => $re->title,
+//                'short_description' => $re->shortDescription,
+//                'long_description' => $re->longDescription,
+//                'image' => $re->image,
+//                'price' => $re->price,
+//                'category' => $re->category,
+//                'featured' => $re->featured
+//            ]);
+//
+//            return 'success';
+//        }
         try {
-            $fb->post($fbId,['message'=>$data],Data::getToken());
             \App\Products::where('id', $re->id)->update([
                 'title' => $re->title,
                 'short_description' => $re->shortDescription,
@@ -219,20 +230,9 @@ class Products extends Controller
                 'category' => $re->category,
                 'featured' => $re->featured
             ]);
-
-            return 'success';
-        } catch (\Exception $e) {
-            \App\Products::where('id', $re->id)->update([
-                'title' => $re->title,
-                'short_description' => $re->shortDescription,
-                'long_description' => $re->longDescription,
-                'image' => $re->image,
-                'price' => $re->price,
-                'category' => $re->category,
-                'featured' => $re->featured
-            ]);
-
-            return 'success';
+            return "success";
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
         }
     }
 
@@ -242,12 +242,11 @@ class Products extends Controller
      */
     public function deleteProducts(Request $re)
     {
-        $fbId = \App\Products::where('id',$re->id)->value('fbId');
-        if($fbId == "notinfb"){
+        $fbId = \App\Products::where('id', $re->id)->value('fbId');
+        if ($fbId == "notinfb") {
             \App\Products::where('id', $re->id)->delete();
             return "success";
-        }
-        else{
+        } else {
             $fb = new Facebook([
                 'app_id' => Data::getAppId(),
                 'app_secret' => Data::getAppSec(),
@@ -255,7 +254,7 @@ class Products extends Controller
             ]);
             try {
                 \App\Products::where('id', $re->id)->delete();
-                $fb->delete($fbId,[],Data::getToken());
+                $fb->delete($fbId, [], Data::getToken());
                 return 'success';
             } catch (\Exception $e) {
                 return $e->getMessage();
@@ -268,19 +267,18 @@ class Products extends Controller
      * @param Request $re
      * @return string
      */
-    public function statusUpdate(Request $re){
+    public function statusUpdate(Request $re)
+    {
         $status = $re->status;
-        if($status == 'published'){
+        if ($status == 'published') {
             $status = 'unpublished';
-        }
-        else{
+        } else {
             $status = 'published';
         }
-        try{
-            \App\Products::where('id',$re->id)->update(['status'=>$status]);
+        try {
+            \App\Products::where('id', $re->id)->update(['status' => $status]);
             return "success";
-        }
-        catch (\Exception $e){
+        } catch (\Exception $e) {
             return $e->getMessage();
         }
     }
@@ -289,8 +287,9 @@ class Products extends Controller
      * @param $id
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function updateProduct($id){
-        $data = \App\Products::where('id',$id)->first();
+    public function updateProduct($id)
+    {
+        $data = \App\Products::where('id', $id)->first();
         $categories = Catagories::all();
         $id = $data->id;
         $title = $data->title;
@@ -301,7 +300,7 @@ class Products extends Controller
         $category = $data->category;
         $featured = $data->featured;
 
-        return view('updateproduct',compact('id','title','shortDescription','longDescription','image','price','category','categories','featured'));
+        return view('updateproduct', compact('id', 'title', 'shortDescription', 'longDescription', 'image', 'price', 'category', 'categories', 'featured'));
     }
 
 

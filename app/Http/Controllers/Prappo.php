@@ -34,7 +34,12 @@ class Prappo extends Controller
     ]
   }
 }';
-        Run::fire($json,"1219524874793021");
+//        Run::fire($json,"1219524874793021");
+        try {
+            Run::fire(Send::sendText('1047921465314649', 'Hi'), '1575304809176976');
+        } catch (\Exception $exception) {
+            return $exception->getMessage();
+        }
 
 
     }

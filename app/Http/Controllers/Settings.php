@@ -140,15 +140,15 @@ class Settings extends Controller
      * @param $key
      * @return mixed
      */
-//    public static function get($value, $userId = "")
-//    {
-//        if ($userId == "") {
-//            return \App\Settings::where('userId', Auth::user()->id)->value($value);
-//        } else {
-//            return \App\Settings::where('userId', $userId)->value($value);
-//        }
-//
-//    }
+    public static function get($value, $userId = "")
+    {
+        if ($userId == "") {
+            return \App\Settings::where('userId', Auth::user()->id)->value($value);
+        } else {
+            return \App\Settings::where('userId', $userId)->value($value);
+        }
+
+    }
 
     public static function getLang($key)
     {

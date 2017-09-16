@@ -20,8 +20,8 @@ class Run extends Controller
 
     public static function now($input)
     {
-        $sender = $input['entry'][0]['messaging'][0]['sender']['id'];
-        $pageId = $input['entry'][0]['messaging'][0]['recipient']['id'];
+        $sender = isset($input['entry'][0]['messaging'][0]['sender']['id']) ? $input['entry'][0]['messaging'][0]['sender']['id'] : $input['entry'][0]['standby'][0]['sender']['id'];
+        $pageId = isset($input['entry'][0]['messaging'][0]['recipient']['id']) ? $input['entry'][0]['messaging'][0]['recipient']['id'] : $input['entry'][0]['standby'][0]['recipient']['id'];
         $postback = isset($input['entry'][0]['messaging'][0]['postback']['payload']) ? $input['entry'][0]['messaging'][0]['postback']['payload'] : "nothing";
         $catPostBack = isset($input['entry'][0]['messaging'][0]['message']['quick_reply']['payload']) ? $input['entry'][0]['messaging'][0]['message']['quick_reply']['payload'] : "nothing";
         $message = isset($input['entry'][0]['messaging'][0]['message']['text']) ? $input['entry'][0]['messaging'][0]['message']['text'] : "nothing";
@@ -83,41 +83,6 @@ class Run extends Controller
 //
 //        }
 
-        /*
-         * Checking user if already exist
-         * */
-        echo "get incoming connection\n";
-
-        try {
-            if (Customers::where('fbId', $sender)->where('pageId', $pageId)->exists()) {
-
-            } else {
-                try {
-                    $user = Receive::getProfile($sender, Data::getToken($pageId));
-                    $customer = new Customers();
-                    $customer->fbId = $sender;
-                    $customer->name = $user->first_name . " " . $user->last_name;
-                    $customer->image = $user->profile_pic;
-                    $customer->street = "none";
-                    $customer->city = "none";
-                    $customer->country = "none";
-                    $customer->postal_code = "none";
-                    $customer->state = "none";
-                    $customer->mobile = "none";
-                    $customer->lang = $lang;
-                    $customer->pageId = $pageId;
-                    $customer->userId = FacebookPages::where('pageId', $pageId)->value('userId');
-                    $customer->save();
-                } catch (\Exception $exception) {
-
-                }
-
-
-            }
-        } catch (\Exception $e) {
-            echo $e->getMessage() . "\n";
-        }
-
 
         if (!empty($input['entry'][0]['messaging'][0]['message'])) {
 
@@ -136,13 +101,49 @@ class Run extends Controller
                         self::fire(Send::sendText($sender, "Check out our menu"), $pageId);
                         self::fire(Send::sendText($sender, "Or, If you need more help please type 'help'"), $pageId);
                         self::fire(self::getMenu($sender, $pageId), $pageId);
+                        echo "Customer already exists";
                         exit;
 
+
                     } else {
+                        //                        Create new customer
+                        try {
+                            if (Customers::where('fbId', $sender)->where('pageId', $pageId)->exists()) {
+
+                            } else {
+                                try {
+                                    $user = Receive::getProfile($sender, Data::getToken($pageId));
+                                    $customer = new Customers();
+                                    $customer->fbId = $sender;
+                                    $customer->name = $user->first_name . " " . $user->last_name;
+                                    $customer->image = $user->profile_pic;
+                                    $customer->street = "none";
+                                    $customer->city = "none";
+                                    $customer->country = "none";
+                                    $customer->postal_code = "none";
+                                    $customer->state = "none";
+                                    $customer->mobile = "none";
+                                    $customer->lang = $lang;
+                                    $customer->pageId = $pageId;
+                                    $customer->userId = FacebookPages::where('pageId', $pageId)->value('userId');
+                                    $customer->save();
+                                } catch (\Exception $exception) {
+
+                                }
+
+
+                            }
+                        } catch (\Exception $e) {
+                            echo $e->getMessage() . "\n";
+                        }
+
                         self::fire(Send::sendText($sender, "Hi " . Customers::where('fbId', $sender)->value('name')), $pageId);
                         self::fire(Send::sendText($sender, "Check out our menu"), $pageId);
                         self::fire(Send::sendText($sender, "Or, If you need more help please type 'help'"), $pageId);
                         self::fire(self::getMenu($sender, $pageId), $pageId);
+                        echo "New customer detected";
+
+
                         exit;
                     }
                 } elseif (Bot::checkPer($message) >= 65) {
@@ -213,6 +214,11 @@ class Run extends Controller
             }
 
         }
+
+        /*
+         * Checking user if already exist
+         * */
+        echo "get incoming connection\n";
 
 
         if ($catPostBack == "nothing") {
@@ -619,20 +625,20 @@ class Run extends Controller
     public static function getCategories($sender, $pageId)
     {
         $menu = [];
-        $wooCommerce = new WooController($pageId);
-        $woo = $wooCommerce->woo;
+//        $wooCommerce = new WooController($pageId);
+//        $woo = $wooCommerce->woo;
 
         $data = Catagories::where('pageId', $pageId)->get();
         foreach ($data as $d) {
             array_push($menu, Send::quickBtn($d->name, "cat_" . $d->id));
         }
-        try {
-            $categories = $woo->get('products/categories');
-            foreach ($categories as $category) {
-                array_push($menu, Send::quickBtn($category['name'], "cat_" . $category['id']));
-            }
-        } catch (\Exception $e) {
-        }
+//        try {
+//            $categories = $woo->get('products/categories');
+//            foreach ($categories as $category) {
+//                array_push($menu, Send::quickBtn($category['name'], "cat_" . $category['id']));
+//            }
+//        } catch (\Exception $e) {
+//        }
 
 
         return Send::button($sender, "Categories", $menu);
